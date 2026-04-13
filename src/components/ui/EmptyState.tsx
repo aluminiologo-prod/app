@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+import { View, Text, useColorScheme } from 'react-native';
 import { PackageOpen } from 'lucide-react-native';
 import { Colors } from '../../theme/colors';
 
@@ -8,16 +8,33 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ title = 'No results', subtitle }: EmptyStateProps) {
+  const isDark = useColorScheme() === 'dark';
+
   return (
-    <View className="flex-1 items-center justify-center py-20 px-6">
-      <View className="w-16 h-16 rounded-full bg-content2 dark:bg-[#1F2028] items-center justify-center mb-4">
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 80, paddingHorizontal: 24 }}>
+      <View style={{
+        width: 64, height: 64, borderRadius: 32,
+        backgroundColor: isDark ? Colors.dark.content2 : Colors.light.content2,
+        alignItems: 'center', justifyContent: 'center',
+        marginBottom: 16,
+      }}>
         <PackageOpen size={28} color={Colors.secondaryDark} />
       </View>
-      <Text className="text-base font-semibold text-foreground dark:text-[#ECEDEE] text-center mb-1">
+      <Text style={{
+        fontSize: 16, fontWeight: '600',
+        color: isDark ? Colors.dark.foreground : Colors.light.foreground,
+        textAlign: 'center', marginBottom: 4,
+      }}>
         {title}
       </Text>
       {subtitle && (
-        <Text className="text-sm text-[#71717A] text-center">{subtitle}</Text>
+        <Text style={{
+          fontSize: 14,
+          color: Colors.light.muted,
+          textAlign: 'center',
+        }}>
+          {subtitle}
+        </Text>
       )}
     </View>
   );

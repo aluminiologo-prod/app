@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  View, Text, TextInput, Pressable, SafeAreaView,
+  View, Text, TextInput, Pressable,
   useColorScheme, Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Search, SlidersHorizontal, RefreshCw } from 'lucide-react-native';
