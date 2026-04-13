@@ -1,0 +1,1 @@
+- [Test Infrastructure Setup](project_test_infrastructure.md) — expo-sdk 54 jest quirks, NativeWind style assertions, supabase mock pattern, known open-handle workaround
