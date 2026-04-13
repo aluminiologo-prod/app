@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import { SectionList, View, Text, ActivityIndicator, RefreshControl } from 'react-native';
+import { SectionList, View, Text, ActivityIndicator, RefreshControl, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { TransferCard } from './TransferCard';
 import { EmptyState } from '../ui/EmptyState';
@@ -32,9 +32,12 @@ interface TransferCardGridProps {
   items: Transfer[];
   isLoading: boolean;
   isFetching: boolean;
+  isError?: boolean;
+  error?: Error | null;
   total: number;
   canUpdate: boolean;
   hasActiveFilters: boolean;
+  pendingIds?: Set<string>;
   onViewDetails: (transfer: Transfer) => void;
   onDispatch: (transfer: Transfer) => void;
   onReceive: (transfer: Transfer) => void;
@@ -45,9 +48,12 @@ export function TransferCardGrid({
   items,
   isLoading,
   isFetching,
+  isError,
+  error,
   total,
   canUpdate,
   hasActiveFilters,
+  pendingIds,
   onViewDetails,
   onDispatch,
   onReceive,
@@ -74,12 +80,13 @@ export function TransferCardGrid({
       <TransferCard
         transfer={item}
         canUpdate={canUpdate}
+        isPending={pendingIds?.has(item.id) ?? false}
         onViewDetails={onViewDetails}
         onDispatch={onDispatch}
         onReceive={onReceive}
       />
     ),
-    [canUpdate, onViewDetails, onDispatch, onReceive],
+    [canUpdate, pendingIds, onViewDetails, onDispatch, onReceive],
   );
 
   // Stable renderSectionHeader.
@@ -109,6 +116,26 @@ export function TransferCardGrid({
     return (
       <View className="flex-1 items-center justify-center py-20">
         <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View className="flex-1 items-center justify-center px-8 py-20">
+        <Text className="text-base font-semibold text-center mb-1" style={{ color: '#EC1F00' }}>
+          {t('inTransit.errorTitle')}
+        </Text>
+        <Text className="text-sm text-center mb-4" style={{ color: '#71717A' }}>
+          {error?.message ?? t('inTransit.errorMessage')}
+        </Text>
+        <Pressable
+          onPress={onRefresh}
+          className="px-4 py-2 rounded-xl active:opacity-70"
+          style={{ backgroundColor: Colors.primary }}
+        >
+          <Text className="text-sm font-medium text-white">{t('inTransit.retry')}</Text>
+        </Pressable>
       </View>
     );
   }

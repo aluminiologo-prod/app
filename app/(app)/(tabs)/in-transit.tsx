@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View, Text, TextInput, Pressable,
-  useColorScheme, Alert,
+  useColorScheme,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQueryClient } from '@tanstack/react-query';
@@ -17,6 +17,7 @@ import { TransferCardGrid } from '../../../src/components/transfers/TransferCard
 import { TransferDetailSheet } from '../../../src/components/transfers/TransferDetailSheet';
 import { TransferReceiveSheet } from '../../../src/components/transfers/TransferReceiveSheet';
 import { FilterSheet } from '../../../src/components/ui/FilterSheet';
+import { ConfirmModal } from '../../../src/components/ui/ConfirmModal';
 import { Colors } from '../../../src/theme/colors';
 import { ModuleCode } from '../../../src/config/module-codes';
 import type { Transfer, ReceiveTransferPayload } from '../../../src/types/transfer';
@@ -49,8 +50,12 @@ export default function InTransitScreen() {
   const fetchFn = useCallback(
     (params: InTransitFilters & { page: number; limit: number }) => {
       const today = new Date().toISOString().slice(0, 10);
+      // Strip empty-string values so optional UUID fields aren't sent as ''
+      const clean = Object.fromEntries(
+        Object.entries(params).filter(([, v]) => v !== ''),
+      ) as typeof params;
       return getTransfers({
-        ...params,
+        ...clean,
         statuses: ALL_STATUSES,
         dispatched_today: today,
         received_today: today,
@@ -144,24 +149,32 @@ export default function InTransitScreen() {
     [crud.handleFilterChange],
   );
 
-  // Dispatch
-  const openDispatchConfirm = useCallback((transfer: Transfer) => {
-    Alert.alert(
-      t('inTransit.confirmDispatchTitle'),
-      t('inTransit.confirmDispatchMessage', { code: transfer.code }),
-      [
-        { text: t('inTransit.clearFilters'), style: 'cancel' },
-        {
-          text: t('inTransit.dispatch'),
-          onPress: () => handleDispatch(transfer),
-          style: 'default',
-        },
-      ],
-    );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [t]);
+  // In-flight transfer IDs — cards show a spinner while these are pending
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
-  async function handleDispatch(transfer: Transfer) {
+  const addPending = useCallback((id: string) =>
+    setPendingIds((prev) => new Set(prev).add(id)), []);
+  const removePending = useCallback((id: string) =>
+    setPendingIds((prev) => { const next = new Set(prev); next.delete(id); return next; }), []);
+
+  // Dispatch confirm modal
+  const [dispatchTarget, setDispatchTarget] = useState<Transfer | null>(null);
+  const [dispatchLoading, setDispatchLoading] = useState(false);
+
+  const openDispatchConfirm = useCallback((transfer: Transfer) => {
+    setDispatchTarget(transfer);
+  }, []);
+
+  const closeDispatchConfirm = useCallback(() => {
+    if (!dispatchLoading) setDispatchTarget(null);
+  }, [dispatchLoading]);
+
+  async function handleDispatch() {
+    if (!dispatchTarget) return;
+    const id = dispatchTarget.id;
+    setDispatchLoading(true);
+    addPending(id);
+
     const listQueryKey = ['in-transit', 'list'];
     const previousData = queryClient.getQueriesData({ queryKey: listQueryKey });
 
@@ -171,13 +184,14 @@ export default function InTransitScreen() {
       (old) => {
         if (!old) return old;
         return { ...old, items: old.items.map((item) =>
-          item.id === transfer.id ? { ...item, status: 'IN_TRANSIT' as const } : item
+          item.id === id ? { ...item, status: 'IN_TRANSIT' as const } : item
         )};
       },
     );
+    setDispatchTarget(null);
 
     try {
-      await dispatchTransfer(transfer.id);
+      await dispatchTransfer(id);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       toastSuccess(t('inTransit.dispatchSuccess'));
       crud.refresh();
@@ -187,12 +201,17 @@ export default function InTransitScreen() {
       }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       toastApiError(err);
+    } finally {
+      setDispatchLoading(false);
+      removePending(id);
     }
   }
 
   async function handleReceive(payload: ReceiveTransferPayload) {
     if (!receiveTarget) return;
+    const id = receiveTarget.id;
     setReceiveLoading(true);
+    addPending(id);
 
     const listQueryKey = ['in-transit', 'list'];
     const previousData = queryClient.getQueriesData({ queryKey: listQueryKey });
@@ -203,14 +222,14 @@ export default function InTransitScreen() {
       (old) => {
         if (!old) return old;
         return { ...old, items: old.items.map((item) =>
-          item.id === receiveTarget.id ? { ...item, status: 'RECEIVED' as const } : item
+          item.id === id ? { ...item, status: 'RECEIVED' as const } : item
         )};
       },
     );
     setReceiveOpen(false);
 
     try {
-      await receiveTransfer(receiveTarget.id, payload);
+      await receiveTransfer(id, payload);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       toastSuccess(t('inTransit.receiveSuccess'));
       crud.refresh();
@@ -223,6 +242,7 @@ export default function InTransitScreen() {
     } finally {
       setReceiveLoading(false);
       setReceiveTarget(null);
+      removePending(id);
     }
   }
 
@@ -319,9 +339,12 @@ export default function InTransitScreen() {
         items={crud.items}
         isLoading={crud.loading}
         isFetching={crud.fetching}
+        isError={crud.isError}
+        error={crud.error}
         total={crud.total}
         canUpdate={canUpdate}
         hasActiveFilters={hasActiveFilters}
+        pendingIds={pendingIds}
         onViewDetails={handleOpenDetail}
         onDispatch={openDispatchConfirm}
         onReceive={handleOpenReceive}
@@ -349,6 +372,16 @@ export default function InTransitScreen() {
         stores={stores}
         onApply={handleFilterApply}
         onClear={crud.clearFilters}
+      />
+      <ConfirmModal
+        isOpen={!!dispatchTarget}
+        onClose={closeDispatchConfirm}
+        onConfirm={handleDispatch}
+        title={t('inTransit.confirmDispatchTitle')}
+        message={t('inTransit.confirmDispatchMessage', { code: dispatchTarget?.code })}
+        confirmLabel={t('inTransit.dispatch')}
+        confirmColor="warning"
+        isLoading={dispatchLoading}
       />
     </SafeAreaView>
   );

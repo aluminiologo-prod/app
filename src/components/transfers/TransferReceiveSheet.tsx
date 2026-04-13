@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { View, Text, Pressable, TextInput, ActivityIndicator } from 'react-native';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -36,6 +37,7 @@ export function TransferReceiveSheet({
 }: TransferReceiveSheetProps) {
   const { t } = useTranslation('transfers');
   const sheetRef = useRef<BottomSheet>(null);
+  const { top: safeTop } = useSafeAreaInsets();
   const { data: transfer, isLoading: loadingDetail } = useTransfer(transferId, { enabled: isOpen && !!transferId });
 
   const [receiveLines, setReceiveLines] = useState<ReceiveLine[]>([]);
@@ -76,11 +78,11 @@ export function TransferReceiveSheet({
   );
 
   const totalSent = useMemo(
-    () => transfer?.lines?.reduce((acc, l) => acc + l.quantity_sent, 0) ?? 0,
+    () => transfer?.lines?.reduce((acc, l) => acc + Number(l.quantity_sent), 0) ?? 0,
     [transfer?.lines],
   );
   const totalReceived = useMemo(
-    () => receiveLines.reduce((acc, l) => acc + l.quantity_received, 0),
+    () => receiveLines.reduce((acc, l) => acc + Number(l.quantity_received), 0),
     [receiveLines],
   );
   const loss = totalSent - totalReceived;
@@ -127,6 +129,7 @@ export function TransferReceiveSheet({
       ref={sheetRef}
       index={-1}
       snapPoints={['75%', '95%']}
+      topInset={safeTop}
       enablePanDownToClose
       onClose={onClose}
       backgroundStyle={SHEET_BG_STYLE}
@@ -134,7 +137,7 @@ export function TransferReceiveSheet({
     >
       <BottomSheetScrollView contentContainerStyle={CONTENT_CONTAINER_STYLE}>
         {/* Header */}
-        <View className="flex-row items-center justify-between px-5 pt-2 pb-3">
+        <View className="flex-row items-center justify-between px-5 pt-3 pb-3">
           <View>
             <Text className="text-lg font-bold text-[#11181C]">{t('inTransit.receiveModal.title')}</Text>
             <Text className="text-xs text-[#71717A]">{t('inTransit.receiveModal.subtitle')}</Text>
@@ -190,13 +193,13 @@ export function TransferReceiveSheet({
                       className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
                       style={{ backgroundColor: line.article_variant?.color?.hex ?? '#D4D4D8' }}
                     />
-                    <View className="flex-1">
+                    <View className="flex-1" style={{ marginRight: 12 }}>
                       <Text className="text-sm font-medium text-[#11181C]" numberOfLines={1}>
                         {line.article_variant?.article?.name}
                       </Text>
-                      <Text className="text-xs text-[#71717A]">{line.article_variant?.sku}</Text>
+                      <Text className="text-xs text-[#71717A]" numberOfLines={1}>{line.article_variant?.sku}</Text>
                     </View>
-                    <View className="flex-row items-center gap-2">
+                    <View className="flex-row items-center" style={{ gap: 6, flexShrink: 0 }}>
                       <Text className="text-sm text-[#71717A]">
                         {t('inTransit.receiveModal.sent')}: {line.quantity_sent}
                       </Text>

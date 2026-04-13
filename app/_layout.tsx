@@ -1,7 +1,8 @@
 import '../global.css';
 import '../src/i18n';
 import { useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text, TextInput } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -20,6 +21,16 @@ import { AuthProvider } from '../src/contexts/AuthContext';
 
 SplashScreen.preventAutoHideAsync();
 
+// Apply Inter as the default font for every Text and TextInput in the app.
+// React Native has no CSS font inheritance — each component must set fontFamily
+// explicitly. defaultProps is the only clean way to set a global default without
+// wrapping every component in a custom Text.
+const interRegular = { fontFamily: 'Inter_400Regular' };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(Text as any).defaultProps = { ...((Text as any).defaultProps ?? {}), style: interRegular };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(TextInput as any).defaultProps = { ...((TextInput as any).defaultProps ?? {}), style: interRegular };
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -33,6 +44,12 @@ const queryClient = new QueryClient({
 // Stable style object — defined once at module scope so GestureHandlerRootView
 // never receives a new object reference on re-renders.
 const rootStyle = StyleSheet.create({ flex: { flex: 1 } });
+
+// Separate component so useSafeAreaInsets can be called inside SafeAreaProvider.
+function ToastWithInsets() {
+  const { top } = useSafeAreaInsets();
+  return <Toast topOffset={top + 8} />;
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -76,7 +93,7 @@ export default function RootLayout() {
               <Stack.Screen name="(app)" />
             </Stack>
             <StatusBar style="auto" />
-            <Toast />
+            <ToastWithInsets />
           </AuthProvider>
         </QueryClientProvider>
       </SafeAreaProvider>

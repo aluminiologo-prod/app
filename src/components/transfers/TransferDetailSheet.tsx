@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { View, Text, ActivityIndicator, Pressable } from 'react-native';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react-native';
 import { StatusChip } from '../ui/StatusChip';
@@ -43,6 +44,7 @@ interface TransferDetailSheetProps {
 export function TransferDetailSheet({ transferId, isOpen, onClose }: TransferDetailSheetProps) {
   const { t } = useTranslation('transfers');
   const sheetRef = useRef<BottomSheet>(null);
+  const { top: safeTop } = useSafeAreaInsets();
   const { data: transfer, isLoading } = useTransfer(transferId, { enabled: isOpen && !!transferId });
 
   useEffect(() => {
@@ -58,6 +60,7 @@ export function TransferDetailSheet({ transferId, isOpen, onClose }: TransferDet
       ref={sheetRef}
       index={-1}
       snapPoints={['55%', '90%']}
+      topInset={safeTop}
       enablePanDownToClose
       onClose={onClose}
       backgroundStyle={SHEET_BG_STYLE}
@@ -65,7 +68,7 @@ export function TransferDetailSheet({ transferId, isOpen, onClose }: TransferDet
     >
       <BottomSheetScrollView contentContainerStyle={CONTENT_CONTAINER_STYLE}>
         {/* Header */}
-        <View className="flex-row items-center justify-between px-5 pt-2 pb-4">
+        <View className="flex-row items-center justify-between px-5 pt-3 pb-4">
           <Text className="text-lg font-bold text-[#11181C]">
             {t('inTransit.detail.title')}
           </Text>

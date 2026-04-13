@@ -30,11 +30,12 @@ export function useCrudList<T, Q extends Record<string, unknown>>({
     [filters, page, limit],
   );
 
-  const { data, isLoading, isFetching, refetch } = useQuery({
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: [entityKey, 'list', queryParams],
     queryFn: () => fetchFn(queryParams as Q & { page: number; limit: number }),
     staleTime,
     placeholderData: keepPreviousData,
+    retry: 2,
   });
 
   const items = data?.items ?? [];
@@ -76,6 +77,8 @@ export function useCrudList<T, Q extends Record<string, unknown>>({
     hasActiveFilters,
     loading: isLoading,
     fetching: isFetching,
+    isError,
+    error: error as Error | null,
     refresh,
     queryClient,
   };

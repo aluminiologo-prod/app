@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { ArrowRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import type { Transfer } from '../../types/transfer';
 interface TransferCardProps {
   transfer: Transfer;
   canUpdate: boolean;
+  isPending?: boolean;
   onViewDetails: (transfer: Transfer) => void;
   onDispatch: (transfer: Transfer) => void;
   onReceive: (transfer: Transfer) => void;
@@ -18,6 +19,7 @@ interface TransferCardProps {
 export const TransferCard = React.memo(function TransferCard({
   transfer,
   canUpdate,
+  isPending = false,
   onViewDetails,
   onDispatch,
   onReceive,
@@ -58,7 +60,7 @@ export const TransferCard = React.memo(function TransferCard({
       <View className="p-4">
         {/* Header: code + status */}
         <View className="flex-row items-center justify-between mb-3">
-          <Text className="font-bold text-base text-foreground dark:text-[#ECEDEE] font-mono tracking-wide">
+          <Text className="font-bold text-base text-foreground dark:text-[#ECEDEE] tracking-wide">
             {transfer.code}
           </Text>
           <StatusChip status={transfer.status} label={statusLabel} />
@@ -80,41 +82,48 @@ export const TransferCard = React.memo(function TransferCard({
           {t('inTransit.products', { count: productCount })} · {t('inTransit.units', { count: unitCount })}
         </Text>
 
-        {/* Actions */}
-        <View className="flex-row items-center justify-end gap-2">
-          <Pressable
-            onPress={handleViewDetails}
-            className="px-3 py-1.5 rounded-xl border border-[#E4E4E7] dark:border-[#272831] active:opacity-70"
-          >
-            <Text className="text-xs font-medium text-[#31374A] dark:text-[#9BA1B0]">
-              {t('inTransit.viewDetails')}
-            </Text>
-          </Pressable>
-
-          {canUpdate && transfer.status === 'DRAFT' && (
+        {/* Actions / Pending indicator */}
+        {isPending ? (
+          <View className="flex-row items-center justify-end" style={{ gap: 6 }}>
+            <ActivityIndicator size="small" color={Colors.primary} />
+            <Text className="text-xs text-[#71717A]">{t('inTransit.processing')}</Text>
+          </View>
+        ) : (
+          <View className="flex-row items-center justify-end" style={{ gap: 8 }}>
             <Pressable
-              onPress={handleDispatch}
-              className="px-3 py-1.5 rounded-xl active:opacity-70"
-              style={{ backgroundColor: Colors.warning }}
+              onPress={handleViewDetails}
+              className="px-3 py-1.5 rounded-xl border border-[#E4E4E7] dark:border-[#272831] active:opacity-70"
             >
-              <Text className="text-xs font-semibold text-white">
-                {t('inTransit.dispatch')}
+              <Text className="text-xs font-medium text-[#31374A] dark:text-[#9BA1B0]">
+                {t('inTransit.viewDetails')}
               </Text>
             </Pressable>
-          )}
 
-          {canUpdate && transfer.status === 'IN_TRANSIT' && (
-            <Pressable
-              onPress={handleReceive}
-              className="px-3 py-1.5 rounded-xl active:opacity-70"
-              style={{ backgroundColor: Colors.success }}
-            >
-              <Text className="text-xs font-semibold text-white">
-                {t('inTransit.receive')}
-              </Text>
-            </Pressable>
-          )}
-        </View>
+            {canUpdate && transfer.status === 'DRAFT' && (
+              <Pressable
+                onPress={handleDispatch}
+                className="px-3 py-1.5 rounded-xl active:opacity-70"
+                style={{ backgroundColor: Colors.warning }}
+              >
+                <Text className="text-xs font-semibold text-white">
+                  {t('inTransit.dispatch')}
+                </Text>
+              </Pressable>
+            )}
+
+            {canUpdate && transfer.status === 'IN_TRANSIT' && (
+              <Pressable
+                onPress={handleReceive}
+                className="px-3 py-1.5 rounded-xl active:opacity-70"
+                style={{ backgroundColor: Colors.success }}
+              >
+                <Text className="text-xs font-semibold text-white">
+                  {t('inTransit.receive')}
+                </Text>
+              </Pressable>
+            )}
+          </View>
+        )}
       </View>
     </Pressable>
   );
