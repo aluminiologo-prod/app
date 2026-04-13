@@ -1,23 +1,26 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TextInput, Pressable, KeyboardAvoidingView,
-  Platform, ScrollView, ActivityIndicator,
+  Platform, ScrollView, ActivityIndicator, Image, useColorScheme,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Phone } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Colors } from '../../src/theme/colors';
 import { PHONE_COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from '../../src/config/constants';
 
+const LOGO_LIGHT = require('../../assets/logo-light.png');
+const LOGO_DARK  = require('../../assets/logo-dark.png');
 const OTP_COOLDOWN = 30;
 
 export default function LoginOtpScreen() {
   const { t } = useTranslation('auth');
   const { requestOtp, loginWithOtp } = useAuth();
+  const isDark = useColorScheme() === 'dark';
 
   const [step, setStep] = useState<'phone' | 'code'>('phone');
-  const [countryDial, setCountryDial] = useState(DEFAULT_COUNTRY_CODE);
+  const [countryDial] = useState(DEFAULT_COUNTRY_CODE);
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -78,6 +81,13 @@ export default function LoginOtpScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-1 justify-center px-6 py-12">
+          {/* Logo */}
+          <Image
+            source={isDark ? LOGO_DARK : LOGO_LIGHT}
+            style={{ width: 210, height: 55, marginBottom: 24 }}
+            resizeMode="contain"
+          />
+
           {/* Back button */}
           <Pressable
             onPress={() => step === 'code' ? setStep('phone') : router.back()}
@@ -88,15 +98,11 @@ export default function LoginOtpScreen() {
           </Pressable>
 
           {/* Header */}
-          <View className="items-center mb-10">
-            <View className="w-16 h-16 rounded-2xl items-center justify-center mb-4"
-              style={{ backgroundColor: Colors.primary }}>
-              <Phone size={28} color="white" />
-            </View>
+          <View className="mb-7">
             <Text className="text-2xl font-bold text-[#11181C] dark:text-[#ECEDEE]">
               {t('loginOtp.title')}
             </Text>
-            <Text className="text-sm text-[#71717A] mt-1 text-center">
+            <Text className="text-sm text-[#71717A] mt-1">
               {step === 'code'
                 ? t('loginOtp.codeSent', { phone: maskedPhone })
                 : t('loginOtp.subtitle')

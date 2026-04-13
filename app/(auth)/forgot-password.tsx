@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, TextInput, Pressable, KeyboardAvoidingView,
-  Platform, ScrollView, ActivityIndicator,
+  Platform, ScrollView, ActivityIndicator, Image, useColorScheme,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -9,9 +9,13 @@ import { ArrowLeft, Mail, CheckCircle } from 'lucide-react-native';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Colors } from '../../src/theme/colors';
 
+const LOGO_LIGHT = require('../../assets/logo-light.png');
+const LOGO_DARK  = require('../../assets/logo-dark.png');
+
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation('auth');
   const { forgotPassword } = useAuth();
+  const isDark = useColorScheme() === 'dark';
 
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +43,12 @@ export default function ForgotPasswordScreen() {
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View className="flex-1 justify-center px-6 py-12">
+          <Image
+            source={isDark ? LOGO_DARK : LOGO_LIGHT}
+            style={{ width: 210, height: 55, marginBottom: 24 }}
+            resizeMode="contain"
+          />
+
           <Pressable onPress={() => router.back()} className="flex-row items-center gap-1 mb-8 active:opacity-70 self-start">
             <ArrowLeft size={18} color="#71717A" />
             <Text className="text-sm text-[#71717A]">{t('resetPassword.save')}</Text>

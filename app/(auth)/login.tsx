@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, Pressable, KeyboardAvoidingView,
-  Platform, ScrollView, ActivityIndicator,
+  Platform, ScrollView, ActivityIndicator, Image, useColorScheme,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -9,9 +9,14 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Colors } from '../../src/theme/colors';
 
+const LOGO_LIGHT = require('../../assets/logo-light.png');
+const LOGO_DARK  = require('../../assets/logo-dark.png');
+
 export default function LoginScreen() {
   const { t } = useTranslation('auth');
   const { login, isAuthenticated } = useAuth();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,11 +57,16 @@ export default function LoginScreen() {
       >
         <View className="flex-1 justify-center px-6 py-12">
           {/* Logo / Brand */}
-          <View className="items-center mb-10">
-            <View className="w-16 h-16 rounded-2xl items-center justify-center mb-4"
-              style={{ backgroundColor: Colors.primary }}>
-              <Text className="text-white font-bold text-2xl">A</Text>
-            </View>
+          <View className="items-start mb-8">
+            <Image
+              source={isDark ? LOGO_DARK : LOGO_LIGHT}
+              style={{ width: 210, height: 55 }}
+              resizeMode="contain"
+            />
+          </View>
+
+          {/* Headline */}
+          <View className="mb-7">
             <Text className="text-2xl font-bold text-[#11181C] dark:text-[#ECEDEE]">
               {t('login.title')}
             </Text>
