@@ -54,7 +54,7 @@ export default function InTransitScreen() {
         statuses: ALL_STATUSES,
         dispatched_today: today,
         received_today: today,
-      } as never);
+      });
     },
     [],
   );
