@@ -3,7 +3,7 @@ import { Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Truck, ArrowLeftRight, User } from 'lucide-react-native';
 import { Colors } from '../../../src/theme/colors';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, Platform } from 'react-native';
 
 // tabBarLabelStyle never changes — define once at module scope.
 const TAB_LABEL_STYLE = { fontFamily: 'Inter_500Medium', fontSize: 11 } as const;
@@ -26,9 +26,10 @@ export default function TabsLayout() {
         backgroundColor: tabBarBg,
         borderTopColor: borderColor,
         borderTopWidth: 1,
-        height: 60,
-        paddingBottom: 8,
-        paddingTop: 6,
+        ...Platform.select({
+          ios:     { height: 84, paddingBottom: 28, paddingTop: 10 },
+          android: { height: 60, paddingBottom: 8,  paddingTop: 6  },
+        }),
       },
       tabBarLabelStyle: TAB_LABEL_STYLE,
     }),
