@@ -282,13 +282,13 @@ export default function InTransitScreen() {
         {/* Search + filter row */}
         <View className="flex-row items-center gap-2">
           <View
-            className="flex-1 flex-row items-center rounded-xl px-3 py-2.5 border"
-            style={{ backgroundColor: isDark ? '#1F2028' : '#F4F4F5', borderColor }}
+            className="flex-1 flex-row items-center rounded-xl px-3 border"
+            style={{ backgroundColor: isDark ? '#1F2028' : '#F4F4F5', borderColor, height: 44 }}
           >
             <Search size={16} color={mutedColor} />
             <TextInput
               className="flex-1 ml-2 text-sm"
-              style={{ color: textColor }}
+              style={{ color: textColor, height: 44, textAlignVertical: 'center' }}
               placeholder={t('inTransit.searchPlaceholder')}
               placeholderTextColor={mutedColor}
               value={crud.filters.search as string}

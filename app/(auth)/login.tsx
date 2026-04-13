@@ -85,10 +85,11 @@ export default function LoginScreen() {
             <Text className="text-sm font-medium text-[#11181C] dark:text-[#ECEDEE] mb-2">
               {t('login.email')}
             </Text>
-            <View className="flex-row items-center border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-4 py-3.5 bg-white dark:bg-[#18191F]">
+            <View className="flex-row items-center border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-4 bg-white dark:bg-[#18191F]" style={{ height: 52 }}>
               <Mail size={18} color="#71717A" />
               <TextInput
                 className="flex-1 ml-3 text-base text-[#11181C] dark:text-[#ECEDEE]"
+                style={{ height: 52, textAlignVertical: 'center' }}
                 placeholder={t('login.emailPlaceholder')}
                 placeholderTextColor="#71717A"
                 value={email}
@@ -106,10 +107,11 @@ export default function LoginScreen() {
             <Text className="text-sm font-medium text-[#11181C] dark:text-[#ECEDEE] mb-2">
               {t('login.password')}
             </Text>
-            <View className="flex-row items-center border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-4 py-3.5 bg-white dark:bg-[#18191F]">
+            <View className="flex-row items-center border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-4 bg-white dark:bg-[#18191F]" style={{ height: 52 }}>
               <Lock size={18} color="#71717A" />
               <TextInput
                 className="flex-1 ml-3 text-base text-[#11181C] dark:text-[#ECEDEE]"
+                style={{ height: 52, textAlignVertical: 'center' }}
                 placeholder={t('login.passwordPlaceholder')}
                 placeholderTextColor="#71717A"
                 value={password}

@@ -125,14 +125,15 @@ export default function LoginOtpScreen() {
               </Text>
               <View className="flex-row gap-2 mb-6">
                 {/* Country code picker (simplified) */}
-                <View className="border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-3 py-3.5 bg-white dark:bg-[#18191F] justify-center">
+                <View className="border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-3 bg-white dark:bg-[#18191F] justify-center" style={{ height: 52 }}>
                   <Text className="text-base text-[#11181C] dark:text-[#ECEDEE] font-medium">
                     {PHONE_COUNTRY_CODES.find((c) => c.dial === countryDial)?.label ?? countryDial}
                   </Text>
                 </View>
-                <View className="flex-1 border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-4 py-3.5 bg-white dark:bg-[#18191F]">
+                <View className="flex-1 border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-4 bg-white dark:bg-[#18191F]" style={{ height: 52 }}>
                   <TextInput
-                    className="text-base text-[#11181C] dark:text-[#ECEDEE]"
+                    className="flex-1 text-base text-[#11181C] dark:text-[#ECEDEE]"
+                    style={{ height: 52, textAlignVertical: 'center' }}
                     placeholder={t('loginOtp.phonePlaceholder')}
                     placeholderTextColor="#71717A"
                     value={phone}
@@ -162,10 +163,11 @@ export default function LoginOtpScreen() {
               <Text className="text-sm font-medium text-[#11181C] dark:text-[#ECEDEE] mb-2">
                 {t('loginOtp.enterCode')}
               </Text>
-              <View className="border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-4 py-3.5 bg-white dark:bg-[#18191F] mb-6 items-center">
+              <View className="border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-4 bg-white dark:bg-[#18191F] mb-6 items-center justify-center" style={{ height: 72 }}>
                 <TextInput
                   ref={codeInputRef}
                   className="text-3xl font-bold text-[#11181C] dark:text-[#ECEDEE] tracking-[16px] w-full text-center"
+                  style={{ height: 72, textAlignVertical: 'center' }}
                   placeholder="· · · · · ·"
                   placeholderTextColor="#D4D4D8"
                   value={code}
