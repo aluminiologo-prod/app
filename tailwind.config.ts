@@ -1,0 +1,80 @@
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
+  content: [
+    './app/**/*.{js,jsx,ts,tsx}',
+    './src/**/*.{js,jsx,ts,tsx}',
+  ],
+  presets: [require('nativewind/preset')],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        // Primary scale (matches web hero.ts)
+        primary: {
+          50:  '#EBF1FF',
+          100: '#D6E4FF',
+          200: '#ADC8FF',
+          300: '#84ADFF',
+          400: '#5B91FF',
+          500: '#3874FF',
+          600: '#2D5DCC',
+          700: '#224699',
+          800: '#172F66',
+          900: '#0B1833',
+          DEFAULT: '#3874FF',
+        },
+        // Secondary scale
+        secondary: {
+          50:  '#ECEDF0',
+          100: '#D9DBE1',
+          200: '#B3B7C3',
+          300: '#8D93A5',
+          400: '#676F87',
+          500: '#31374A',
+          600: '#272C3B',
+          700: '#1D212C',
+          800: '#13161D',
+          900: '#0A0B0F',
+          DEFAULT: '#31374A',
+        },
+        success:   { DEFAULT: '#25B003', foreground: '#FFFFFF' },
+        warning:   { DEFAULT: '#E5780B', foreground: '#FFFFFF' },
+        danger:    { DEFAULT: '#EC1F00', foreground: '#FFFFFF' },
+        // Semantic surface tokens (light)
+        background: '#FFFFFF',
+        foreground: '#11181C',
+        content1:  '#FFFFFF',
+        content2:  '#F4F4F5',
+        content3:  '#E4E4E7',
+        content4:  '#D4D4D8',
+        // Dark mode tokens referenced via CSS variables
+        dark: {
+          background: '#0F1117',
+          foreground: '#ECEDEE',
+          content1:   '#18191F',
+          content2:   '#1F2028',
+          content3:   '#272831',
+          content4:   '#30313A',
+          secondary:  '#9BA1B0',
+        },
+        // Border tokens
+        border:      '#E4E4E7',
+        'border-light': '#F4F4F5',
+      },
+      fontFamily: {
+        sans:  ['Inter_400Regular'],
+        medium: ['Inter_500Medium'],
+        semibold: ['Inter_600SemiBold'],
+        bold:  ['Inter_700Bold'],
+      },
+      borderRadius: {
+        '2xl': '16px',
+        '3xl': '24px',
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;

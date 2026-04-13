@@ -1,0 +1,21 @@
+{
+  "loading": "Loading...",
+  "error": "Something went wrong",
+  "retry": "Retry",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "save": "Save",
+  "close": "Close",
+  "back": "Back",
+  "apply": "Apply",
+  "clear": "Clear",
+  "search": "Search",
+  "noResults": "No results found",
+  "tabs": {
+    "inTransit": "In Transit",
+    "transfers": "Transfers",
+    "profile": "Profile"
+  },
+  "comingSoon": "Coming soon",
+  "version": "Version"
+}

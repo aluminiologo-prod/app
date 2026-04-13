@@ -1,0 +1,21 @@
+{
+  "loading": "Cargando...",
+  "error": "Algo salió mal",
+  "retry": "Reintentar",
+  "cancel": "Cancelar",
+  "confirm": "Confirmar",
+  "save": "Guardar",
+  "close": "Cerrar",
+  "back": "Volver",
+  "apply": "Aplicar",
+  "clear": "Limpiar",
+  "search": "Buscar",
+  "noResults": "No se encontraron resultados",
+  "tabs": {
+    "inTransit": "En Tránsito",
+    "transfers": "Transferencias",
+    "profile": "Perfil"
+  },
+  "comingSoon": "Próximamente",
+  "version": "Versión"
+}
