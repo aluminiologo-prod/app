@@ -266,7 +266,7 @@ export function FilterSheet({
 
         {/* Footer actions */}
         <View style={{
-          flexDirection: 'row', gap: 12,
+          flexDirection: 'row',
           paddingHorizontal: 20, paddingTop: 12,
           paddingBottom: Platform.OS === 'ios' ? 36 : 20,
           borderTopWidth: 1, borderTopColor: borderColor,
@@ -275,7 +275,7 @@ export function FilterSheet({
           <Pressable
             onPress={handleClear}
             style={({ pressed }) => ({
-              flex: 1, height: 52, borderRadius: 16,
+              flex: 1, height: 52, borderRadius: 16, marginRight: 12,
               borderWidth: 1, borderColor,
               alignItems: 'center', justifyContent: 'center',
               backgroundColor: pressed
@@ -348,11 +348,6 @@ function PickerRow({
     <Pressable
       onPress={onSelect}
       style={({ pressed }) => ({
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        height: 50,
         borderBottomWidth: isLast ? 0 : 1,
         borderBottomColor: borderColor,
         backgroundColor: pressed
@@ -362,23 +357,31 @@ function PickerRow({
             : 'transparent',
       })}
     >
-      <Text style={{
-        fontSize: 15,
-        fontWeight: selected ? '600' : '400',
-        color: selected ? Colors.primary : (isDark ? Colors.dark.foreground : Colors.light.foreground),
-        flex: 1,
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        height: 50,
       }}>
-        {label}
-      </Text>
-      {selected && (
-        <View style={{
-          width: 22, height: 22, borderRadius: 11,
-          backgroundColor: Colors.primary,
-          alignItems: 'center', justifyContent: 'center',
+        <Text style={{
+          fontSize: 15,
+          fontWeight: selected ? '600' : '400',
+          color: selected ? Colors.primary : (isDark ? Colors.dark.foreground : Colors.light.foreground),
+          flex: 1,
         }}>
-          <Check size={12} color="#FFFFFF" strokeWidth={3} />
-        </View>
-      )}
+          {label}
+        </Text>
+        {selected && (
+          <View style={{
+            width: 22, height: 22, borderRadius: 11,
+            backgroundColor: Colors.primary,
+            alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Check size={12} color="#FFFFFF" strokeWidth={3} />
+          </View>
+        )}
+      </View>
     </Pressable>
   );
 }
