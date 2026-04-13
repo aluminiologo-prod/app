@@ -34,7 +34,8 @@
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease"
-      }
+      },
+      "channel": "production-apk"
     }
   },
   "submit": {}

@@ -54,6 +54,12 @@
           }
         }
       ]
-    ]
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/804cb622-c924-40e8-904d-dc5457bf5068"
+    }
   }
 }
