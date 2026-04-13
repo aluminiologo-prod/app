@@ -234,7 +234,10 @@ export default function InTransitScreen() {
   const hasActiveFilters = crud.filters.from_store_id || crud.filters.to_store_id || crud.filters.orderBy !== 'created_at:desc';
 
   // Memoised inline styles — only recomputed when the relevant variables change.
-  const safeAreaStyle = useMemo(() => ({ backgroundColor: bg }), [bg]);
+  // SafeAreaView uses headerBg (white / dark-card) so the status-bar/notch
+  // area is the same colour as the header — no grey bleed behind the notch.
+  const safeAreaStyle = useMemo(() => ({ backgroundColor: headerBg }), [headerBg]);
+  const contentStyle  = useMemo(() => ({ flex: 1, backgroundColor: bg }), [bg]);
   const headerStyle = useMemo(
     () => ({ backgroundColor: headerBg, borderBottomColor: borderColor }),
     [headerBg, borderColor],
@@ -304,7 +307,8 @@ export default function InTransitScreen() {
         </View>
       </View>
 
-      {/* Transfer list */}
+      {/* Transfer list — own grey background so only the list area is tinted */}
+      <View style={contentStyle}>
       <TransferCardGrid
         items={crud.items}
         isLoading={crud.loading}
@@ -316,6 +320,7 @@ export default function InTransitScreen() {
         onReceive={handleOpenReceive}
         onRefresh={crud.refresh}
       />
+      </View>
 
       {/* Bottom sheets */}
       <TransferDetailSheet
