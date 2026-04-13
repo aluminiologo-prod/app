@@ -13,7 +13,12 @@
     "test:coverage": "jest --coverage --forceExit",
     "prepare": "husky",
     "version:bump": "node scripts/bump-version.js bump",
-    "version:revert": "node scripts/bump-version.js revert"
+    "version:revert": "node scripts/bump-version.js revert",
+    "build:store": "eas build",
+    "build:store:preview": "eas build --profile production",
+    "build:develop": "eas build --profile development",
+    "build:preview": "eas build --profile preview --clear-cache",
+    "clean:install": "rm -rf node_modules/ && rm -rf yarn.lock && rm -rf android && rm -rf .expo && rm -rf ios && npm cache clean --force && yarn cache clean && yarn install"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
