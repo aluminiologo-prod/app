@@ -1,4 +1,5 @@
-import { View, Text, Pressable, SafeAreaView, useColorScheme } from 'react-native';
+import { View, Text, Pressable, useColorScheme } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { LogOut, User } from 'lucide-react-native';
 import { useAuth } from '../../../src/contexts/AuthContext';
@@ -10,7 +11,7 @@ export default function ProfileScreen() {
   const isDark = useColorScheme() === 'dark';
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#0F1117' : '#F4F4F5' }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: isDark ? '#0F1117' : '#F4F4F5' }}>
       <View style={{ flex: 1, backgroundColor: isDark ? '#0F1117' : '#F4F4F5' }}>
       {/* User card */}
       <View className="bg-white dark:bg-[#18191F] mx-4 mt-6 rounded-2xl p-5 border border-[#E4E4E7] dark:border-[#272831]">

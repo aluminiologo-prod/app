@@ -252,7 +252,7 @@ export default function InTransitScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1" style={safeAreaStyle}>
+    <SafeAreaView className="flex-1" style={safeAreaStyle} edges={['top']}>
       {/* Header */}
       <View
         className="border-b px-4 pt-2 pb-3"

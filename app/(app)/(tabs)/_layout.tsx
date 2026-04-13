@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Truck, ArrowLeftRight, User } from 'lucide-react-native';
 import { Colors } from '../../../src/theme/colors';
 import { useColorScheme, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // tabBarLabelStyle never changes — define once at module scope.
 const TAB_LABEL_STYLE = { fontFamily: 'Inter_500Medium', fontSize: 11 } as const;
@@ -12,11 +13,15 @@ export default function TabsLayout() {
   const { t } = useTranslation('common');
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const insets = useSafeAreaInsets();
 
   const tabBarBg = isDark ? '#18191F' : '#FFFFFF';
   const borderColor = isDark ? '#272831' : '#E4E4E7';
 
-  // Memoised screen options — only recreated when the color scheme changes.
+  // On Android, insets.bottom reflects the gesture nav bar height (0 on older
+  // devices with hardware buttons, ~24–48px on gesture-nav devices).
+  // On iOS, the Tabs navigator handles the home indicator automatically when
+  // we set an explicit height + paddingBottom, so we just add a fixed offset.
   const screenOptions = useMemo(
     () => ({
       headerShown: false,
@@ -27,19 +32,25 @@ export default function TabsLayout() {
         borderTopColor: borderColor,
         borderTopWidth: 1,
         ...Platform.select({
-          ios:     { height: 84, paddingBottom: 28, paddingTop: 10 },
-          android: { height: 60, paddingBottom: 8,  paddingTop: 6  },
+          ios: {
+            height: 56 + insets.bottom,
+            paddingBottom: insets.bottom,
+            paddingTop: 8,
+          },
+          android: {
+            height: 56 + insets.bottom,
+            paddingBottom: insets.bottom + 4,
+            paddingTop: 6,
+          },
         }),
       },
       tabBarLabelStyle: TAB_LABEL_STYLE,
     }),
-    [isDark, tabBarBg, borderColor],
+    [isDark, tabBarBg, borderColor, insets.bottom],
   );
 
   return (
-    <Tabs
-      screenOptions={screenOptions}
-    >
+    <Tabs screenOptions={screenOptions}>
       <Tabs.Screen
         name="in-transit"
         options={{
