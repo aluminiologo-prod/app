@@ -8,11 +8,6 @@
       "developmentClient": true,
       "distribution": "internal",
       "channel": "development",
-      "env": {
-        "EXPO_PUBLIC_API_URL": "https://core-backend-production-5e25.up.railway.app/api",
-        "EXPO_PUBLIC_SUPABASE_URL": "https://yalbubdmlgoferptjhff.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhbGJ1YmRtbGdvZmVycHRqaGZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0MDc4OTgsImV4cCI6MjA4Njk4Mzg5OH0.xq0W2irtqzxE4eZ8-O7gTo4afNpuca8_RSSxR3TQgdY"
-      },
       "ios": {
         "buildConfiguration": "Debug",
         "simulator": false
@@ -26,11 +21,6 @@
       "channel": "production",
       "distribution": "store",
       "autoIncrement": false,
-      "env": {
-        "EXPO_PUBLIC_API_URL": "https://core-backend-production-5e25.up.railway.app/api",
-        "EXPO_PUBLIC_SUPABASE_URL": "https://yalbubdmlgoferptjhff.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhbGJ1YmRtbGdvZmVycHRqaGZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0MDc4OTgsImV4cCI6MjA4Njk4Mzg5OH0.xq0W2irtqzxE4eZ8-O7gTo4afNpuca8_RSSxR3TQgdY"
-      },
       "ios": {
         "buildConfiguration": "Release"
       },
