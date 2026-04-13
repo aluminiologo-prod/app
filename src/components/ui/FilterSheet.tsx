@@ -168,33 +168,42 @@ export function FilterSheet({
           paddingHorizontal: 20, paddingTop: 12, paddingBottom: 14,
           borderBottomWidth: 1, borderBottomColor: borderColor,
         }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          {/* Title */}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <SlidersHorizontal size={18} color={Colors.primary} />
-            <Text style={{ fontSize: 17, fontWeight: '700', color: textColor }}>
+            <Text style={{ fontSize: 17, fontWeight: '700', color: textColor, marginLeft: 8 }}>
               {t('transfers:inTransit.filters')}
             </Text>
-            {hasActiveFilters && (
-              <View style={{
-                backgroundColor: Colors.primaryLight,
-                borderRadius: 99, paddingHorizontal: 8, paddingVertical: 2,
-              }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: Colors.primary }}>
-                  Active
-                </Text>
-              </View>
-            )}
           </View>
 
-          <Pressable
-            onPress={onClose}
-            style={({ pressed }) => ({
-              width: 30, height: 30, borderRadius: 15,
-              alignItems: 'center', justifyContent: 'center',
-              backgroundColor: pressed ? borderColor : (isDark ? Colors.dark.content3 : Colors.light.content2),
-            })}
-          >
-            <X size={14} color={Colors.light.muted} />
-          </Pressable>
+          {/* Right side: Clear (only when active) + X */}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {hasActiveFilters && (
+              <Pressable
+                onPress={handleClear}
+                style={({ pressed }) => ({
+                  paddingHorizontal: 12, paddingVertical: 6,
+                  borderRadius: 99, marginRight: 6,
+                  backgroundColor: pressed ? Colors.primaryLight : 'transparent',
+                })}
+              >
+                <Text style={{ fontSize: 13, fontWeight: '600', color: Colors.primary }}>
+                  {t('common:clear')}
+                </Text>
+              </Pressable>
+            )}
+
+            <Pressable
+              onPress={onClose}
+              style={({ pressed }) => ({
+                width: 30, height: 30, borderRadius: 15,
+                alignItems: 'center', justifyContent: 'center',
+                backgroundColor: pressed ? borderColor : (isDark ? Colors.dark.content3 : Colors.light.content2),
+              })}
+            >
+              <X size={14} color={Colors.light.muted} />
+            </Pressable>
+          </View>
         </View>
 
         {/* Options */}
@@ -264,34 +273,17 @@ export function FilterSheet({
           </FilterSection>
         </ScrollView>
 
-        {/* Footer actions */}
+        {/* Footer: full-width Apply */}
         <View style={{
-          flexDirection: 'row',
           paddingHorizontal: 20, paddingTop: 12,
           paddingBottom: Platform.OS === 'ios' ? 36 : 20,
           borderTopWidth: 1, borderTopColor: borderColor,
           backgroundColor: surfaceBg,
         }}>
           <Pressable
-            onPress={handleClear}
-            style={({ pressed }) => ({
-              flex: 1, height: 52, borderRadius: 16, marginRight: 12,
-              borderWidth: 1, borderColor,
-              alignItems: 'center', justifyContent: 'center',
-              backgroundColor: pressed
-                ? (isDark ? Colors.dark.content3 : Colors.light.content2)
-                : 'transparent',
-            })}
-          >
-            <Text style={{ fontSize: 15, fontWeight: '600', color: textColor }}>
-              {t('common:clear')}
-            </Text>
-          </Pressable>
-
-          <Pressable
             onPress={handleApply}
             style={({ pressed }) => ({
-              flex: 1, height: 52, borderRadius: 16,
+              height: 52, borderRadius: 16,
               alignItems: 'center', justifyContent: 'center',
               backgroundColor: pressed ? '#2960E0' : Colors.primary,
             })}
