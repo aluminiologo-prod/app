@@ -1,6 +1,6 @@
 {
   "name": "aluminiologo-app",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.ts",
   "scripts": {
     "start": "expo start --dev-client",
@@ -11,7 +11,9 @@
     "test": "jest --forceExit",
     "test:watch": "jest --watch --forceExit",
     "test:coverage": "jest --coverage --forceExit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "version:bump": "node scripts/bump-version.js bump",
+    "version:revert": "node scripts/bump-version.js revert"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
