@@ -34,6 +34,7 @@ interface TransferCardGridProps {
   isFetching: boolean;
   total: number;
   canUpdate: boolean;
+  hasActiveFilters: boolean;
   onViewDetails: (transfer: Transfer) => void;
   onDispatch: (transfer: Transfer) => void;
   onReceive: (transfer: Transfer) => void;
@@ -46,6 +47,7 @@ export function TransferCardGrid({
   isFetching,
   total,
   canUpdate,
+  hasActiveFilters,
   onViewDetails,
   onDispatch,
   onReceive,
@@ -115,7 +117,7 @@ export function TransferCardGrid({
     return (
       <EmptyState
         title={t('inTransit.noTransfersFound')}
-        subtitle={t('inTransit.clearFilters')}
+        subtitle={hasActiveFilters ? t('inTransit.clearFilters') : undefined}
       />
     );
   }

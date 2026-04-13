@@ -232,7 +232,12 @@ export default function InTransitScreen() {
   const textColor = isDark ? '#ECEDEE' : '#11181C';
   const mutedColor = '#71717A';
 
-  const hasActiveFilters = crud.filters.from_store_id || crud.filters.to_store_id || crud.filters.orderBy !== 'created_at:desc';
+  const hasActiveFilters = !!(
+    crud.filters.search ||
+    crud.filters.from_store_id ||
+    crud.filters.to_store_id ||
+    crud.filters.orderBy !== 'created_at:desc'
+  );
 
   // Memoised inline styles — only recomputed when the relevant variables change.
   // SafeAreaView uses headerBg (white / dark-card) so the status-bar/notch
@@ -316,6 +321,7 @@ export default function InTransitScreen() {
         isFetching={crud.fetching}
         total={crud.total}
         canUpdate={canUpdate}
+        hasActiveFilters={hasActiveFilters}
         onViewDetails={handleOpenDetail}
         onDispatch={openDispatchConfirm}
         onReceive={handleOpenReceive}
