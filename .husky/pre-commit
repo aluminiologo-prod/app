@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# 1. Run lint-staged (ESLint on staged .ts/.tsx files)
+npx lint-staged
+
+# 2. TypeScript type check (full project, no emit)
+npx tsc --noEmit
+
+# 3. Unit tests
+npm test

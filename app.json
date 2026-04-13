@@ -15,12 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.aluminiologo.app"
+      "bundleIdentifier": "com.aluminiologo.app",
+      "icon": "./assets/icon.png"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#3874FF"
+        "backgroundColor": "#3874FF",
+        "monochromeImage": "./assets/adaptive-icon.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
