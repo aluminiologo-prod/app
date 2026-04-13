@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, useColorScheme } from 'react-native';
 import { STATUS_COLORS, STATUS_COLORS_DARK } from '../../theme/colors';
 import type { TransferStatus } from '../../types/transfer';
@@ -8,7 +9,7 @@ interface StatusChipProps {
   size?: 'sm' | 'md';
 }
 
-export function StatusChip({ status, label, size = 'md' }: StatusChipProps) {
+export const StatusChip = React.memo(function StatusChip({ status, label, size = 'md' }: StatusChipProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const palette = isDark ? STATUS_COLORS_DARK : STATUS_COLORS;
@@ -27,4 +28,4 @@ export function StatusChip({ status, label, size = 'md' }: StatusChipProps) {
       </Text>
     </View>
   );
-}
+});

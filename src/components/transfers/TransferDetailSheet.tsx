@@ -1,12 +1,17 @@
 import { useRef, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, Pressable } from 'react-native';
-import BottomSheet, { BottomSheetView, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { View, Text, ActivityIndicator, Pressable } from 'react-native';
+import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react-native';
 import { StatusChip } from '../ui/StatusChip';
 import { Colors } from '../../theme/colors';
 import { useTransfer } from '../../hooks/queries';
 import type { Transfer } from '../../types/transfer';
+
+// Stable style objects — defined once at module scope.
+const SHEET_BG_STYLE = { backgroundColor: '#FFFFFF' };
+const SHEET_HANDLE_STYLE = { backgroundColor: '#D4D4D8' };
+const CONTENT_CONTAINER_STYLE = { paddingBottom: 32 };
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return '—';
@@ -55,10 +60,10 @@ export function TransferDetailSheet({ transferId, isOpen, onClose }: TransferDet
       snapPoints={['55%', '90%']}
       enablePanDownToClose
       onClose={onClose}
-      backgroundStyle={{ backgroundColor: '#FFFFFF' }}
-      handleIndicatorStyle={{ backgroundColor: '#D4D4D8' }}
+      backgroundStyle={SHEET_BG_STYLE}
+      handleIndicatorStyle={SHEET_HANDLE_STYLE}
     >
-      <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+      <BottomSheetScrollView contentContainerStyle={CONTENT_CONTAINER_STYLE}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-5 pt-2 pb-4">
           <Text className="text-lg font-bold text-[#11181C]">

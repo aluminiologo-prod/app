@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import type { PaginatedResponse } from '../types/common';
 
@@ -22,7 +22,13 @@ export function useCrudList<T, Q extends Record<string, unknown>>({
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const queryClient = useQueryClient();
 
-  const queryParams = { ...filters, page, limit };
+  // Memoised query params — a new object is only produced when filters/page/limit
+  // actually change, preventing spurious TanStack Query cache misses.
+  const queryParams = useMemo(
+    () => ({ ...filters, page, limit }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filters, page, limit],
+  );
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: [entityKey, 'list', queryParams],

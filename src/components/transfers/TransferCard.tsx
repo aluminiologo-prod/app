@@ -1,3 +1,4 @@
+import React, { useCallback } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { ArrowRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -14,7 +15,7 @@ interface TransferCardProps {
   onReceive: (transfer: Transfer) => void;
 }
 
-export function TransferCard({
+export const TransferCard = React.memo(function TransferCard({
   transfer,
   canUpdate,
   onViewDetails,
@@ -28,10 +29,25 @@ export function TransferCard({
 
   const statusLabel = t(`status.${transfer.status}`);
 
-  function handlePress() {
+  const handlePress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onViewDetails(transfer);
-  }
+  }, [onViewDetails, transfer]);
+
+  const handleViewDetails = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onViewDetails(transfer);
+  }, [onViewDetails, transfer]);
+
+  const handleDispatch = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onDispatch(transfer);
+  }, [onDispatch, transfer]);
+
+  const handleReceive = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onReceive(transfer);
+  }, [onReceive, transfer]);
 
   return (
     <Pressable
@@ -67,7 +83,7 @@ export function TransferCard({
         {/* Actions */}
         <View className="flex-row items-center justify-end gap-2">
           <Pressable
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onViewDetails(transfer); }}
+            onPress={handleViewDetails}
             className="px-3 py-1.5 rounded-xl border border-[#E4E4E7] dark:border-[#272831] active:opacity-70"
           >
             <Text className="text-xs font-medium text-[#31374A] dark:text-[#9BA1B0]">
@@ -77,7 +93,7 @@ export function TransferCard({
 
           {canUpdate && transfer.status === 'DRAFT' && (
             <Pressable
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onDispatch(transfer); }}
+              onPress={handleDispatch}
               className="px-3 py-1.5 rounded-xl active:opacity-70"
               style={{ backgroundColor: Colors.warning }}
             >
@@ -89,7 +105,7 @@ export function TransferCard({
 
           {canUpdate && transfer.status === 'IN_TRANSIT' && (
             <Pressable
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onReceive(transfer); }}
+              onPress={handleReceive}
               className="px-3 py-1.5 rounded-xl active:opacity-70"
               style={{ backgroundColor: Colors.success }}
             >
@@ -102,4 +118,4 @@ export function TransferCard({
       </View>
     </Pressable>
   );
-}
+});

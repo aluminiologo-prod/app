@@ -1,14 +1,17 @@
-import { useRef, useEffect, useState } from 'react';
-import {
-  View, Text, Pressable, TextInput, ScrollView, ActivityIndicator, Alert,
-} from 'react-native';
+import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
+import { View, Text, Pressable, TextInput, ActivityIndicator } from 'react-native';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTransfer } from '../../hooks/queries';
 import { Colors } from '../../theme/colors';
-import type { Transfer, TransferLine, ReceiveTransferPayload } from '../../types/transfer';
+import type { TransferLine, ReceiveTransferPayload } from '../../types/transfer';
+
+// Stable style objects — defined once at module scope.
+const SHEET_BG_STYLE = { backgroundColor: '#FFFFFF' };
+const SHEET_HANDLE_STYLE = { backgroundColor: '#D4D4D8' };
+const CONTENT_CONTAINER_STYLE = { paddingBottom: 32 };
 
 interface ReceiveLine {
   line_id: string;
@@ -60,33 +63,53 @@ export function TransferReceiveSheet({
     }
   }, [isOpen]);
 
-  const totalSent = transfer?.lines?.reduce((acc, l) => acc + l.quantity_sent, 0) ?? 0;
-  const totalReceived = receiveLines.reduce((acc, l) => acc + l.quantity_received, 0);
+  // O(1) lookup maps to avoid O(n²) find-in-map patterns.
+  const linesById = useMemo<Record<string, TransferLine>>(() => {
+    if (!transfer?.lines) return {};
+    return Object.fromEntries(transfer.lines.map((l) => [l.id, l]));
+  }, [transfer?.lines]);
+
+  // O(1) lookup map: receiveLines state keyed by line_id.
+  const receiveLinesById = useMemo<Record<string, ReceiveLine>>(
+    () => Object.fromEntries(receiveLines.map((rl) => [rl.line_id, rl])),
+    [receiveLines],
+  );
+
+  const totalSent = useMemo(
+    () => transfer?.lines?.reduce((acc, l) => acc + l.quantity_sent, 0) ?? 0,
+    [transfer?.lines],
+  );
+  const totalReceived = useMemo(
+    () => receiveLines.reduce((acc, l) => acc + l.quantity_received, 0),
+    [receiveLines],
+  );
   const loss = totalSent - totalReceived;
   const hasDiscrepancies = loss > 0;
-  const discrepancyCount = receiveLines.filter(
-    (rl) => {
-      const line = transfer?.lines?.find((l) => l.id === rl.line_id);
-      return line && rl.quantity_received < line.quantity_sent;
-    },
-  ).length;
+  const discrepancyCount = useMemo(
+    () =>
+      receiveLines.filter((rl) => {
+        const line = linesById[rl.line_id];
+        return line && rl.quantity_received < line.quantity_sent;
+      }).length,
+    [receiveLines, linesById],
+  );
 
-  function updateLine(lineId: string, qty: number) {
+  const updateLine = useCallback((lineId: string, qty: number) => {
     setReceiveLines((prev) =>
       prev.map((l) => l.line_id === lineId ? { ...l, quantity_received: qty } : l),
     );
-  }
+  }, []);
 
-  function toggleExpand(lineId: string) {
+  const toggleExpand = useCallback((lineId: string) => {
     setReceiveLines((prev) =>
       prev.map((l) => l.line_id === lineId ? { ...l, expanded: !l.expanded } : l),
     );
-  }
+  }, []);
 
-  function handleConfirm() {
+  const handleConfirm = useCallback(() => {
     // Only send overridden lines
     const overriddenLines = receiveLines.filter((rl) => {
-      const line = transfer?.lines?.find((l) => l.id === rl.line_id);
+      const line = linesById[rl.line_id];
       return line && rl.quantity_received !== line.quantity_sent;
     });
 
@@ -97,7 +120,7 @@ export function TransferReceiveSheet({
 
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     onConfirm(payload);
-  }
+  }, [receiveLines, linesById, hasDiscrepancies, incidentNotes, onConfirm]);
 
   return (
     <BottomSheet
@@ -106,10 +129,10 @@ export function TransferReceiveSheet({
       snapPoints={['75%', '95%']}
       enablePanDownToClose
       onClose={onClose}
-      backgroundStyle={{ backgroundColor: '#FFFFFF' }}
-      handleIndicatorStyle={{ backgroundColor: '#D4D4D8' }}
+      backgroundStyle={SHEET_BG_STYLE}
+      handleIndicatorStyle={SHEET_HANDLE_STYLE}
     >
-      <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+      <BottomSheetScrollView contentContainerStyle={CONTENT_CONTAINER_STYLE}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-5 pt-2 pb-3">
           <View>
@@ -145,7 +168,7 @@ export function TransferReceiveSheet({
             </Text>
 
             {transfer.lines?.map((line) => {
-              const rl = receiveLines.find((r) => r.line_id === line.id);
+              const rl = receiveLinesById[line.id];
               if (!rl) return null;
               const discrepancy = rl.quantity_received - line.quantity_sent;
               const hasDiscrepancy = discrepancy < 0;

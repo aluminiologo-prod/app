@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, Pressable, KeyboardAvoidingView,
   Platform, ScrollView, ActivityIndicator,
@@ -19,11 +19,12 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Already logged in → go to app
-  if (isAuthenticated) {
-    router.replace('/(app)/(tabs)/in-transit');
-    return null;
-  }
+  // Already logged in → go to app (use an effect to avoid render-phase side-effects)
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/(app)/(tabs)/in-transit');
+    }
+  }, [isAuthenticated]);
 
   async function handleLogin() {
     if (!email.trim() || !password) return;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View, Text, TextInput, Pressable, SafeAreaView,
   useColorScheme, Alert,
@@ -110,8 +110,41 @@ export default function InTransitScreen() {
   // Filter sheet
   const [filterOpen, setFilterOpen] = useState(false);
 
+  const handleOpenDetail = useCallback((t: Transfer) => {
+    setDetailId(t.id);
+    setDetailOpen(true);
+  }, []);
+
+  const handleCloseDetail = useCallback(() => {
+    setDetailOpen(false);
+    setDetailId(null);
+  }, []);
+
+  const handleOpenReceive = useCallback((t: Transfer) => {
+    setReceiveTarget(t);
+    setReceiveOpen(true);
+  }, []);
+
+  const handleCloseReceive = useCallback(() => {
+    setReceiveOpen(false);
+    setReceiveTarget(null);
+  }, []);
+
+  const handleOpenFilter = useCallback(() => setFilterOpen(true), []);
+  const handleCloseFilter = useCallback(() => setFilterOpen(false), []);
+
+  const handleFilterApply = useCallback(
+    (partial: Partial<InTransitFilters>) => {
+      Object.entries(partial).forEach(([k, v]) =>
+        crud.handleFilterChange(k as keyof InTransitFilters, v),
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [crud.handleFilterChange],
+  );
+
   // Dispatch
-  function openDispatchConfirm(transfer: Transfer) {
+  const openDispatchConfirm = useCallback((transfer: Transfer) => {
     Alert.alert(
       t('inTransit.confirmDispatchTitle'),
       t('inTransit.confirmDispatchMessage', { code: transfer.code }),
@@ -124,7 +157,8 @@ export default function InTransitScreen() {
         },
       ],
     );
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [t]);
 
   async function handleDispatch(transfer: Transfer) {
     const listQueryKey = ['in-transit', 'list'];
@@ -199,12 +233,26 @@ export default function InTransitScreen() {
 
   const hasActiveFilters = crud.filters.from_store_id || crud.filters.to_store_id || crud.filters.orderBy !== 'created_at:desc';
 
+  // Memoised inline styles — only recomputed when the relevant variables change.
+  const safeAreaStyle = useMemo(() => ({ backgroundColor: bg }), [bg]);
+  const headerStyle = useMemo(
+    () => ({ backgroundColor: headerBg, borderBottomColor: borderColor }),
+    [headerBg, borderColor],
+  );
+  const filterBtnStyle = useMemo(
+    () => ({
+      borderColor: hasActiveFilters ? Colors.primary : borderColor,
+      backgroundColor: hasActiveFilters ? Colors.primaryLight : 'transparent',
+    }),
+    [hasActiveFilters, borderColor],
+  );
+
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: bg }}>
+    <SafeAreaView className="flex-1" style={safeAreaStyle}>
       {/* Header */}
       <View
         className="border-b px-4 pt-2 pb-3"
-        style={{ backgroundColor: headerBg, borderBottomColor: borderColor }}
+        style={headerStyle}
       >
         <View className="flex-row items-center justify-between mb-3">
           <Text className="text-xl font-bold" style={{ color: textColor }}>
@@ -247,12 +295,9 @@ export default function InTransitScreen() {
             />
           </View>
           <Pressable
-            onPress={() => setFilterOpen(true)}
+            onPress={handleOpenFilter}
             className="w-10 h-10 rounded-xl items-center justify-center border active:opacity-70"
-            style={{
-              borderColor: hasActiveFilters ? Colors.primary : borderColor,
-              backgroundColor: hasActiveFilters ? Colors.primaryLight : 'transparent',
-            }}
+            style={filterBtnStyle}
           >
             <SlidersHorizontal size={18} color={hasActiveFilters ? Colors.primary : mutedColor} />
           </Pressable>
@@ -266,9 +311,9 @@ export default function InTransitScreen() {
         isFetching={crud.fetching}
         total={crud.total}
         canUpdate={canUpdate}
-        onViewDetails={(t) => { setDetailId(t.id); setDetailOpen(true); }}
+        onViewDetails={handleOpenDetail}
         onDispatch={openDispatchConfirm}
-        onReceive={(t) => { setReceiveTarget(t); setReceiveOpen(true); }}
+        onReceive={handleOpenReceive}
         onRefresh={crud.refresh}
       />
 
@@ -276,23 +321,21 @@ export default function InTransitScreen() {
       <TransferDetailSheet
         transferId={detailId}
         isOpen={detailOpen}
-        onClose={() => { setDetailOpen(false); setDetailId(null); }}
+        onClose={handleCloseDetail}
       />
       <TransferReceiveSheet
         transferId={receiveTarget?.id ?? null}
         isOpen={receiveOpen}
         isLoading={receiveLoading}
-        onClose={() => { setReceiveOpen(false); setReceiveTarget(null); }}
+        onClose={handleCloseReceive}
         onConfirm={handleReceive}
       />
       <FilterSheet
         isOpen={filterOpen}
-        onClose={() => setFilterOpen(false)}
+        onClose={handleCloseFilter}
         filters={crud.filters as InTransitFilters}
         stores={stores}
-        onApply={(partial) => {
-          Object.entries(partial).forEach(([k, v]) => crud.handleFilterChange(k as keyof InTransitFilters, v));
-        }}
+        onApply={handleFilterApply}
         onClear={crud.clearFilters}
       />
     </SafeAreaView>

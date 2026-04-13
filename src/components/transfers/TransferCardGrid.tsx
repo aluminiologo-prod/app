@@ -1,3 +1,4 @@
+import React, { useMemo, useCallback } from 'react';
 import { SectionList, View, Text, ActivityIndicator, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { TransferCard } from './TransferCard';
@@ -15,6 +16,17 @@ const SECTION_KEY_MAP: Record<TransferStatus, string> = {
   DISPATCHED: 'inTransit.sectionDispatched',
   CANCELLED:  'inTransit.sectionDraft',
 };
+
+// Stable content container style — defined outside component to avoid
+// creating a new object on every render.
+const CONTENT_CONTAINER_STYLE = { paddingHorizontal: 16, paddingBottom: 32 };
+const REFRESH_COLORS = [Colors.primary];
+
+interface TransferSection {
+  status: TransferStatus;
+  title: string;
+  data: Transfer[];
+}
 
 interface TransferCardGridProps {
   items: Transfer[];
@@ -41,14 +53,55 @@ export function TransferCardGrid({
 }: TransferCardGridProps) {
   const { t } = useTranslation('transfers');
 
-  // Group by status in order
-  const sections = STATUS_ORDER
-    .map((status) => ({
-      status,
-      title: t(SECTION_KEY_MAP[status]),
-      data: items.filter((item) => item.status === status),
-    }))
-    .filter((s) => s.data.length > 0);
+  // Memoised grouping — only recomputes when items or translations change.
+  const sections: TransferSection[] = useMemo(
+    () =>
+      STATUS_ORDER
+        .map((status) => ({
+          status,
+          title: t(SECTION_KEY_MAP[status]),
+          data: items.filter((item) => item.status === status),
+        }))
+        .filter((s) => s.data.length > 0),
+    [items, t],
+  );
+
+  // Stable renderItem — only recreated when the action callbacks or canUpdate change.
+  const renderItem = useCallback(
+    ({ item }: { item: Transfer }) => (
+      <TransferCard
+        transfer={item}
+        canUpdate={canUpdate}
+        onViewDetails={onViewDetails}
+        onDispatch={onDispatch}
+        onReceive={onReceive}
+      />
+    ),
+    [canUpdate, onViewDetails, onDispatch, onReceive],
+  );
+
+  // Stable renderSectionHeader.
+  const renderSectionHeader = useCallback(
+    ({ section }: { section: TransferSection }) => (
+      <View className="flex-row items-center gap-2 pt-5 pb-3">
+        <Text className="text-sm font-semibold text-[#31374A] dark:text-[#9BA1B0]">
+          {section.title}
+        </Text>
+        <StatusChip status={section.status} label={String(section.data.length)} size="sm" />
+      </View>
+    ),
+    [],
+  );
+
+  // Memoised footer — only updates when total changes.
+  const ListFooterComponent = useMemo(
+    () => (
+      <Text className="text-xs text-[#71717A] text-center mt-2 mb-4">
+        {t('inTransit.totalTransfers', { count: total })}
+      </Text>
+    ),
+    [t, total],
+  );
 
   if (isLoading) {
     return (
@@ -71,38 +124,23 @@ export function TransferCardGrid({
     <SectionList
       sections={sections}
       keyExtractor={(item) => item.id}
-      contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
+      contentContainerStyle={CONTENT_CONTAINER_STYLE}
       refreshControl={
         <RefreshControl
           refreshing={isFetching}
           onRefresh={onRefresh}
           tintColor={Colors.primary}
-          colors={[Colors.primary]}
+          colors={REFRESH_COLORS}
         />
       }
-      renderSectionHeader={({ section }) => (
-        <View className="flex-row items-center gap-2 pt-5 pb-3">
-          <Text className="text-sm font-semibold text-[#31374A] dark:text-[#9BA1B0]">
-            {section.title}
-          </Text>
-          <StatusChip status={section.status} label={String(section.data.length)} size="sm" />
-        </View>
-      )}
-      renderItem={({ item }) => (
-        <TransferCard
-          transfer={item}
-          canUpdate={canUpdate}
-          onViewDetails={onViewDetails}
-          onDispatch={onDispatch}
-          onReceive={onReceive}
-        />
-      )}
-      ListFooterComponent={() => (
-        <Text className="text-xs text-[#71717A] text-center mt-2 mb-4">
-          {t('inTransit.totalTransfers', { count: total })}
-        </Text>
-      )}
+      renderSectionHeader={renderSectionHeader}
+      renderItem={renderItem}
+      ListFooterComponent={ListFooterComponent}
       stickySectionHeadersEnabled={false}
+      removeClippedSubviews={true}
+      maxToRenderPerBatch={8}
+      initialNumToRender={10}
+      windowSize={5}
     />
   );
 }

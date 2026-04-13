@@ -1,10 +1,15 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useTranslation } from 'react-i18next';
 import { Check, X } from 'lucide-react-native';
 import { Colors } from '../../theme/colors';
 import type { Store } from '../../types/store';
+
+// Stable style objects.
+const SHEET_BG_STYLE = { backgroundColor: '#FFFFFF' };
+const SHEET_HANDLE_STYLE = { backgroundColor: '#D4D4D8' };
+const SHEET_CONTENT_STYLE = { flex: 1, paddingBottom: 32 } as const;
 
 interface InTransitFilters {
   search: string;
@@ -58,8 +63,14 @@ export function FilterSheet({ isOpen, onClose, filters, stores, onApply, onClear
     onClose();
   }
 
-  const storeOptions = [{ id: '', name: t('transfers:inTransit.allOrigins') }, ...stores];
-  const destOptions = [{ id: '', name: t('transfers:inTransit.allDestinations') }, ...stores];
+  const storeOptions = useMemo(
+    () => [{ id: '', name: t('transfers:inTransit.allOrigins') }, ...stores],
+    [stores, t],
+  );
+  const destOptions = useMemo(
+    () => [{ id: '', name: t('transfers:inTransit.allDestinations') }, ...stores],
+    [stores, t],
+  );
 
   return (
     <BottomSheet
@@ -68,10 +79,10 @@ export function FilterSheet({ isOpen, onClose, filters, stores, onApply, onClear
       snapPoints={['65%']}
       enablePanDownToClose
       onClose={onClose}
-      backgroundStyle={{ backgroundColor: '#FFFFFF' }}
-      handleIndicatorStyle={{ backgroundColor: '#D4D4D8' }}
+      backgroundStyle={SHEET_BG_STYLE}
+      handleIndicatorStyle={SHEET_HANDLE_STYLE}
     >
-      <BottomSheetView style={{ flex: 1, paddingBottom: 32 }}>
+      <BottomSheetView style={SHEET_CONTENT_STYLE}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-5 pt-2 pb-4">
           <Text className="text-lg font-bold text-[#11181C]">{t('transfers:inTransit.filters')}</Text>

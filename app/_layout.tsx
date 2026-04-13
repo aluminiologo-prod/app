@@ -1,6 +1,7 @@
 import '../global.css';
 import '../src/i18n';
 import { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -28,6 +29,10 @@ const queryClient = new QueryClient({
   },
 });
 
+// Stable style object — defined once at module scope so GestureHandlerRootView
+// never receives a new object reference on re-renders.
+const rootStyle = StyleSheet.create({ flex: { flex: 1 } });
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -45,7 +50,7 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={rootStyle.flex}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <Stack screenOptions={{ headerShown: false }}>
