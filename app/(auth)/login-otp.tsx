@@ -91,14 +91,16 @@ export default function LoginOtpScreen() {
             resizeMode="contain"
           />
 
-          {/* Back button */}
-          <Pressable
-            onPress={() => step === 'code' ? setStep('phone') : router.back()}
-            className="flex-row items-center gap-1 mb-8 active:opacity-70 self-start"
-          >
-            <ArrowLeft size={18} color="#71717A" />
-            <Text className="text-sm text-[#71717A]">{t('loginOtp.changePhone')}</Text>
-          </Pressable>
+          {/* Back button — only visible when on OTP code step */}
+          {step === 'code' && (
+            <Pressable
+              onPress={() => setStep('phone')}
+              className="flex-row items-center gap-1 mb-8 active:opacity-70 self-start"
+            >
+              <ArrowLeft size={18} color="#71717A" />
+              <Text className="text-sm text-[#71717A]">{t('loginOtp.changePhone')}</Text>
+            </Pressable>
+          )}
 
           {/* Header */}
           <View className="mb-7">
@@ -205,6 +207,25 @@ export default function LoginOtpScreen() {
                     ? t('loginOtp.resendIn', { seconds: cooldown })
                     : t('loginOtp.resend')
                   }
+                </Text>
+              </Pressable>
+            </>
+          )}
+
+          {/* Secondary: email login */}
+          {step === 'phone' && (
+            <>
+              <View className="flex-row items-center gap-3 w-full mt-6 mb-4">
+                <View className="flex-1 h-px bg-[#E4E4E7] dark:bg-[#272831]" />
+                <Text className="text-xs text-[#71717A]">o</Text>
+                <View className="flex-1 h-px bg-[#E4E4E7] dark:bg-[#272831]" />
+              </View>
+              <Pressable
+                onPress={() => router.push('/(auth)/login')}
+                className="w-full border border-[#E4E4E7] dark:border-[#272831] rounded-2xl py-4 items-center active:opacity-70"
+              >
+                <Text className="text-sm font-medium text-[#31374A] dark:text-[#9BA1B0]">
+                  {t('loginOtp.signInWithEmail')}
                 </Text>
               </Pressable>
             </>

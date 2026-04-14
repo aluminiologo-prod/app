@@ -6,7 +6,7 @@ export default function AppLayout() {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) return <LoadingScreen />;
-  if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
+  if (!isAuthenticated) return <Redirect href="/(auth)/login-otp" />;
 
   return <Slot />;
 }

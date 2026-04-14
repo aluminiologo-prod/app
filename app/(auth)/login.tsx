@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
+import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react-native';
 import Constants from 'expo-constants';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Colors } from '../../src/theme/colors';
@@ -59,6 +59,15 @@ export default function LoginScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-1 justify-center px-6 py-12">
+          {/* Back to phone login */}
+          <Pressable
+            onPress={() => router.back()}
+            className="flex-row items-center gap-1 mb-6 active:opacity-70 self-start"
+          >
+            <ArrowLeft size={18} color="#71717A" />
+            <Text className="text-sm text-[#71717A]">{t('login.backToPhone')}</Text>
+          </Pressable>
+
           {/* Logo / Brand */}
           <View className="items-start mb-8">
             <Image
@@ -148,24 +157,9 @@ export default function LoginScreen() {
           </Pressable>
 
           {/* Links */}
-          <View className="items-center gap-3">
+          <View className="items-center">
             <Pressable onPress={() => router.push('/(auth)/forgot-password')} className="active:opacity-70">
               <Text className="text-sm text-[#71717A]">{t('login.forgotPassword')}</Text>
-            </Pressable>
-
-            <View className="flex-row items-center gap-3 w-full my-1">
-              <View className="flex-1 h-px bg-[#E4E4E7]" />
-              <Text className="text-xs text-[#71717A]">or</Text>
-              <View className="flex-1 h-px bg-[#E4E4E7]" />
-            </View>
-
-            <Pressable
-              onPress={() => router.push('/(auth)/login-otp')}
-              className="w-full border border-[#E4E4E7] dark:border-[#272831] rounded-2xl py-4 items-center active:opacity-70"
-            >
-              <Text className="text-sm font-medium text-[#31374A] dark:text-[#9BA1B0]">
-                {t('login.signInWithSMS')}
-              </Text>
             </Pressable>
           </View>
 
