@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAccountType(null);
     await SecureStore.deleteItemAsync(USER_STORAGE_KEY);
     await SecureStore.deleteItemAsync(`${USER_STORAGE_KEY}_type`);
-    router.replace('/(auth)/login');
+    router.replace('/(auth)/login-otp');
   }, []);
 
   return (

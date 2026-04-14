@@ -61,7 +61,7 @@ export default function LoginScreen() {
         <View className="flex-1 justify-center px-6 py-12">
           {/* Back to phone login */}
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => router.replace('/(auth)/login-otp')}
             className="flex-row items-center gap-1 mb-6 active:opacity-70 self-start"
           >
             <ArrowLeft size={18} color="#71717A" />

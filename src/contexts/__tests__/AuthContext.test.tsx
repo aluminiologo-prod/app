@@ -352,7 +352,7 @@ describe('AuthContext', () => {
       );
     });
 
-    it('redirects to /(auth)/login after logout', async () => {
+    it('redirects to /(auth)/login-otp after logout', async () => {
       renderWithProvider();
       await waitFor(() =>
         expect(screen.getByTestId('isLoading').props.children).toBe('false'),
@@ -362,7 +362,7 @@ describe('AuthContext', () => {
         fireEvent.press(screen.getByTestId('btn-logout'));
       });
 
-      expect(router.replace).toHaveBeenCalledWith('/(auth)/login');
+      expect(router.replace).toHaveBeenCalledWith('/(auth)/login-otp');
     });
   });
 
