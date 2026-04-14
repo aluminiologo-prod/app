@@ -5,16 +5,15 @@
   },
   "build": {
     "development": {
-      "developmentClient": false,
-      "distribution": "internal",
       "channel": "development",
+      "distribution": "internal",
       "ios": {
-        "buildConfiguration": "Debug",
-        "simulator": false
+        "node": "20.19.4"
       },
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleDebug"
+        "gradleCommand": ":app:assembleRelease",
+        "resourceClass": "large"
       }
     },
     "production": {
