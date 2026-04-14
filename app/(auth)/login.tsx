@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import {
-  View, Text, TextInput, Pressable, KeyboardAvoidingView,
-  Platform, ScrollView, ActivityIndicator, Image, useColorScheme,
+  View, Text, TextInput, Pressable,
+  ActivityIndicator, Image, useColorScheme,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react-native';
@@ -49,15 +50,15 @@ export default function LoginScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-white dark:bg-[#0F1117]"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <KeyboardAwareScrollView
+      style={{ flex: 1, backgroundColor: isDark ? '#0F1117' : '#FFFFFF' }}
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      enableOnAndroid
+      extraScrollHeight={24}
+      enableAutomaticScroll
     >
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
         <View className="flex-1 justify-center px-6 py-12">
           {/* Back to phone login */}
           <Pressable
@@ -168,7 +169,6 @@ export default function LoginScreen() {
             v{APP_VERSION}
           </Text>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 }
