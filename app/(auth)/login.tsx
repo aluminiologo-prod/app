@@ -6,8 +6,11 @@ import {
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
+import Constants from 'expo-constants';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Colors } from '../../src/theme/colors';
+
+const APP_VERSION = Constants.expoConfig?.version ?? '—';
 
 const LOGO_LIGHT = require('../../assets/logo-light.png');
 const LOGO_DARK  = require('../../assets/logo-dark.png');
@@ -165,6 +168,11 @@ export default function LoginScreen() {
               </Text>
             </Pressable>
           </View>
+
+          {/* Version */}
+          <Text className="text-xs text-[#A1A1AA] text-center mt-8">
+            v{APP_VERSION}
+          </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

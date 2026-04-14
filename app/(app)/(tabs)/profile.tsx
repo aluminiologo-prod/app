@@ -2,8 +2,11 @@ import { View, Text, Pressable, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { LogOut, User } from 'lucide-react-native';
+import Constants from 'expo-constants';
 import { useAuth } from '../../../src/contexts/AuthContext';
 import { Colors } from '../../../src/theme/colors';
+
+const APP_VERSION = Constants.expoConfig?.version ?? '—';
 
 export default function ProfileScreen() {
   const { t } = useTranslation('auth');
@@ -45,6 +48,11 @@ export default function ProfileScreen() {
           {t('logout')}
         </Text>
       </Pressable>
+
+      {/* Version */}
+      <Text className="text-xs text-[#A1A1AA] text-center mt-6">
+        v{APP_VERSION}
+      </Text>
       </View>
     </SafeAreaView>
   );
