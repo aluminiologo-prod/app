@@ -1,6 +1,7 @@
 import type { Country } from '../types/country';
 
-export const PHONE_NUMBER_LENGTH = 10;
+/** E.164: leading +, non-zero country digit, 7–14 more digits (total 8–15). */
+export const E164_REGEX = /^\+[1-9]\d{7,14}$/;
 
 /**
  * Parses an E.164 phone string into its components.
@@ -57,10 +58,9 @@ export function extractPhoneNumber(fullPhone: string, countries?: Country[]): st
 }
 
 /**
- * Returns true when fullPhone is a valid E.164 string with a 10-digit local number.
+ * Returns true when fullPhone is a valid E.164 string (+[country][number], 8–15 digits).
+ * The `countries` parameter is kept for API compatibility but is no longer used.
  */
-export function isValidPhone(fullPhone: string, countries?: Country[]): boolean {
-  if (!fullPhone) return false;
-  const number = extractPhoneNumber(fullPhone, countries);
-  return /^\d{10}$/.test(number);
+export function isValidPhone(fullPhone: string, _countries?: Country[]): boolean {
+  return E164_REGEX.test(fullPhone);
 }

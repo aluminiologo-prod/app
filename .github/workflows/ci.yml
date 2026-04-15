@@ -108,4 +108,12 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: EAS Build (no-wait, development profile)
-        run: eas build --platform all --profile development --non-interactive --no-wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "⚠️  EXPO_TOKEN secret is not configured — skipping EAS build."
+            echo "    Go to Settings → Secrets and variables → Actions and add EXPO_TOKEN."
+            exit 0
+          fi
+          eas build --platform all --profile development --non-interactive --no-wait

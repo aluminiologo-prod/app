@@ -23,7 +23,9 @@ export function useStoresList(params?: { limit?: number }) {
 }
 
 function toFlagEmoji(code: string): string {
-  return [...code.toUpperCase()]
+  const normalized = code.trim().toUpperCase();
+  if (!/^[A-Z]{2}$/.test(normalized)) return '';
+  return [...normalized]
     .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
     .join('');
 }

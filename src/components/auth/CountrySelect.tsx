@@ -5,6 +5,7 @@ import {
   useColorScheme, Platform, TextInput,
 } from 'react-native';
 import { Check, ChevronDown, Search, X } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { useCountries } from '../../hooks/queries';
 import { Colors } from '../../theme/colors';
 import type { Country } from '../../types/country';
@@ -28,14 +29,17 @@ export function CountrySelect({
   value,
   onChange,
   label,
-  placeholder = 'Select country',
+  placeholder,
   isInvalid = false,
   errorMessage,
   isDisabled = false,
   isClearable = false,
 }: CountrySelectProps) {
+  const { t } = useTranslation('common');
   const isDark = useColorScheme() === 'dark';
   const { data: countries = [] } = useCountries();
+
+  const resolvedPlaceholder = placeholder ?? t('countrySelect.selectTitle');
 
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -55,10 +59,14 @@ export function CountrySelect({
     );
   }, [countries, search]);
 
-  function handleSelect(c: Country) {
-    onChange(c.id);
+  function closeSheet() {
     setOpen(false);
     setSearch('');
+  }
+
+  function handleSelect(c: Country) {
+    onChange(c.id);
+    closeSheet();
   }
 
   function handleClear() {
@@ -146,13 +154,15 @@ export function CountrySelect({
             <Text style={{ flex: 1, fontSize: 16, color: textColor }}>{selected.name}</Text>
           </>
         ) : (
-          <Text style={{ flex: 1, fontSize: 16, color: mutedColor }}>{placeholder}</Text>
+          <Text style={{ flex: 1, fontSize: 16, color: mutedColor }}>{resolvedPlaceholder}</Text>
         )}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           {isClearable && selected && (
             <Pressable
               onPress={(e) => { e.stopPropagation(); handleClear(); }}
               hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={t('clear')}
             >
               <X size={14} color={mutedColor} />
             </Pressable>
@@ -172,9 +182,9 @@ export function CountrySelect({
         transparent
         animationType="none"
         statusBarTranslucent
-        onRequestClose={() => setOpen(false)}
+        onRequestClose={closeSheet}
       >
-        <TouchableWithoutFeedback onPress={() => setOpen(false)} accessible={false}>
+        <TouchableWithoutFeedback onPress={closeSheet} accessible={false}>
           <Animated.View
             style={{
               position: 'absolute',
@@ -217,10 +227,12 @@ export function CountrySelect({
             borderBottomWidth: 1, borderBottomColor: sheetBorder,
           }}>
             <Text style={{ fontSize: 17, fontWeight: '700', color: textColor }}>
-              {label ?? 'Select country'}
+              {label ?? t('countrySelect.selectTitle')}
             </Text>
             <Pressable
-              onPress={() => { setOpen(false); setSearch(''); }}
+              onPress={closeSheet}
+              accessibilityRole="button"
+              accessibilityLabel={t('close')}
               style={({ pressed }) => ({
                 width: 30, height: 30, borderRadius: 15,
                 alignItems: 'center', justifyContent: 'center',
@@ -244,7 +256,7 @@ export function CountrySelect({
             <Search size={16} color={mutedColor} />
             <TextInput
               style={{ flex: 1, fontSize: 15, color: textColor }}
-              placeholder="Search..."
+              placeholder={t('countrySelect.searchPlaceholder')}
               placeholderTextColor={mutedColor}
               value={search}
               onChangeText={setSearch}
@@ -306,7 +318,7 @@ export function CountrySelect({
             }}
             ListEmptyComponent={
               <View style={{ alignItems: 'center', paddingVertical: 32 }}>
-                <Text style={{ color: mutedColor, fontSize: 14 }}>No results</Text>
+                <Text style={{ color: mutedColor, fontSize: 14 }}>{t('countrySelect.noResults')}</Text>
               </View>
             }
           />

@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   View, Text, TextInput, Pressable, Modal, FlatList,
   Animated, Dimensions, TouchableWithoutFeedback, TouchableOpacity,
   useColorScheme, Platform, ActivityIndicator,
 } from 'react-native';
 import { Check, ChevronDown, Search, X } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { useCountries } from '../../hooks/queries';
 import { parsePhone, buildPhone } from '../../lib/phone';
 import { Colors } from '../../theme/colors';
@@ -37,6 +38,7 @@ export function PhoneInput({
   isRequired = false,
   defaultCountryCode = 'VE',
 }: PhoneInputProps) {
+  const { t } = useTranslation('common');
   const isDark = useColorScheme() === 'dark';
   const { data: rawCountries = [], isLoading } = useCountries();
   const countries = rawCountries.filter((c) => c.dial_code !== '+0');
@@ -97,21 +99,40 @@ export function PhoneInput({
     );
   }, [countries, search]);
 
-  function emitChange(dialCode: string, number: string) {
+  // Max national digits: E.164 caps at 15 total; subtract the dial code digits.
+  const maxNationalLength = selectedCountry
+    ? Math.max(1, 15 - selectedCountry.dial_code.replace(/\D/g, '').length)
+    : 15;
+
+  const emitChange = useCallback((dialCode: string, number: string) => {
     const built = buildPhone(dialCode, number);
     emittedRef.current = built;
     onChange(built);
+  }, [onChange]);
+
+  // Flush pending local digits once selectedCountry resolves (user typed before countries loaded).
+  useEffect(() => {
+    if (!selectedCountry || !localNumber) return;
+    const built = buildPhone(selectedCountry.dial_code, localNumber);
+    if (built !== emittedRef.current) {
+      emittedRef.current = built;
+      onChange(built);
+    }
+  }, [selectedCountry?.dial_code, localNumber, onChange]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function closePicker() {
+    setPickerOpen(false);
+    setSearch('');
   }
 
   function handleCountrySelect(c: Country) {
     setCountryCode(c.code);
-    setPickerOpen(false);
-    setSearch('');
+    closePicker();
     emitChange(c.dial_code, localNumber);
   }
 
   function handleNumberChange(text: string) {
-    const digits = text.replace(/\D/g, '').slice(0, 10);
+    const digits = text.replace(/\D/g, '').slice(0, maxNationalLength);
     setLocalNumber(digits);
     if (selectedCountry) {
       emitChange(selectedCountry.dial_code, digits);
@@ -231,7 +252,7 @@ export function PhoneInput({
             value={localNumber}
             onChangeText={handleNumberChange}
             keyboardType="phone-pad"
-            maxLength={10}
+            maxLength={maxNationalLength}
             editable={!isDisabled}
             returnKeyType="done"
           />
@@ -250,9 +271,9 @@ export function PhoneInput({
         transparent
         animationType="none"
         statusBarTranslucent
-        onRequestClose={() => setPickerOpen(false)}
+        onRequestClose={closePicker}
       >
-        <TouchableWithoutFeedback onPress={() => setPickerOpen(false)} accessible={false}>
+        <TouchableWithoutFeedback onPress={closePicker} accessible={false}>
           <Animated.View
             style={{
               position: 'absolute',
@@ -295,10 +316,12 @@ export function PhoneInput({
             borderBottomWidth: 1, borderBottomColor: sheetBorder,
           }}>
             <Text style={{ fontSize: 17, fontWeight: '700', color: textColor }}>
-              Select country
+              {t('phoneInput.selectTitle')}
             </Text>
             <Pressable
-              onPress={() => { setPickerOpen(false); setSearch(''); }}
+              onPress={closePicker}
+              accessibilityRole="button"
+              accessibilityLabel={t('close')}
               style={({ pressed }) => ({
                 width: 30, height: 30, borderRadius: 15,
                 alignItems: 'center', justifyContent: 'center',
@@ -322,7 +345,7 @@ export function PhoneInput({
             <Search size={16} color={mutedColor} />
             <TextInput
               style={{ flex: 1, fontSize: 15, color: textColor }}
-              placeholder="Search country..."
+              placeholder={t('phoneInput.searchPlaceholder')}
               placeholderTextColor={mutedColor}
               value={search}
               onChangeText={setSearch}
@@ -388,7 +411,7 @@ export function PhoneInput({
             }}
             ListEmptyComponent={
               <View style={{ alignItems: 'center', paddingVertical: 32 }}>
-                <Text style={{ color: mutedColor, fontSize: 14 }}>No results</Text>
+                <Text style={{ color: mutedColor, fontSize: 14 }}>{t('phoneInput.noResults')}</Text>
               </View>
             }
           />

@@ -11,6 +11,7 @@ import Constants from 'expo-constants';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Colors } from '../../src/theme/colors';
 import { PhoneInput } from '../../src/components/auth/PhoneInput';
+import { isValidPhone } from '../../src/lib/phone';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '—';
 
@@ -39,8 +40,10 @@ export default function LoginOtpScreen() {
     return () => clearInterval(timer);
   }, [cooldown]);
 
+  const canSendCode = isValidPhone(phone);
+
   async function handleSendCode() {
-    if (!phone) return;
+    if (!canSendCode) return;
     setError('');
     setIsLoading(true);
     try {
@@ -139,9 +142,9 @@ export default function LoginOtpScreen() {
 
               <Pressable
                 onPress={handleSendCode}
-                disabled={isLoading || !phone}
+                disabled={isLoading || !canSendCode}
                 className="rounded-2xl py-4 items-center active:opacity-80"
-                style={{ backgroundColor: !phone ? '#B3B7C3' : Colors.primary }}
+                style={{ backgroundColor: !canSendCode ? '#B3B7C3' : Colors.primary }}
               >
                 {isLoading
                   ? <ActivityIndicator color="white" />
