@@ -11,6 +11,16 @@
   "clear": "Clear",
   "search": "Search",
   "noResults": "No results found",
+  "phoneInput": {
+    "selectTitle": "Select country",
+    "searchPlaceholder": "Search country...",
+    "noResults": "No results"
+  },
+  "countrySelect": {
+    "selectTitle": "Select country",
+    "searchPlaceholder": "Search...",
+    "noResults": "No results"
+  },
   "tabs": {
     "inTransit": "In Transit",
     "transfers": "Transfers",

@@ -11,6 +11,16 @@
   "clear": "Limpiar",
   "search": "Buscar",
   "noResults": "No se encontraron resultados",
+  "phoneInput": {
+    "selectTitle": "Seleccionar país",
+    "searchPlaceholder": "Buscar país...",
+    "noResults": "Sin resultados"
+  },
+  "countrySelect": {
+    "selectTitle": "Seleccionar país",
+    "searchPlaceholder": "Buscar...",
+    "noResults": "Sin resultados"
+  },
   "tabs": {
     "inTransit": "En Tránsito",
     "transfers": "Transferencias",
