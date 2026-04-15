@@ -12,4 +12,5 @@ export const queryKeys = {
   transfers: createEntityKeys('transferences'),
   inTransit: createEntityKeys('in-transit'),
   stores: createEntityKeys('stores'),
+  countries: createEntityKeys('countries'),
 };

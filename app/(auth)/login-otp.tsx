@@ -10,7 +10,8 @@ import { ArrowLeft } from 'lucide-react-native';
 import Constants from 'expo-constants';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Colors } from '../../src/theme/colors';
-import { PHONE_COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from '../../src/config/constants';
+import { PhoneInput } from '../../src/components/auth/PhoneInput';
+import { isValidPhone } from '../../src/lib/phone';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '—';
 
@@ -24,7 +25,7 @@ export default function LoginOtpScreen() {
   const isDark = useColorScheme() === 'dark';
 
   const [step, setStep] = useState<'phone' | 'code'>('phone');
-  const [countryDial] = useState(DEFAULT_COUNTRY_CODE);
+  // phone stores the full E.164 string ("+584141234567") or ""
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -39,14 +40,14 @@ export default function LoginOtpScreen() {
     return () => clearInterval(timer);
   }, [cooldown]);
 
-  const fullPhone = `${countryDial}${phone.replace(/\D/g, '')}`;
+  const canSendCode = isValidPhone(phone);
 
   async function handleSendCode() {
-    if (!phone.trim()) return;
+    if (isLoading || !canSendCode) return;
     setError('');
     setIsLoading(true);
     try {
-      await requestOtp(fullPhone);
+      await requestOtp(phone);
       setStep('code');
       setCooldown(OTP_COOLDOWN);
       setTimeout(() => codeInputRef.current?.focus(), 300);
@@ -62,7 +63,7 @@ export default function LoginOtpScreen() {
     setError('');
     setIsLoading(true);
     try {
-      await loginWithOtp(fullPhone, code);
+      await loginWithOtp(phone, code);
       router.replace('/(app)/(tabs)/in-transit');
     } catch (err) {
       setError(err instanceof Error ? err.message : t('loginOtp.invalidCode'));
@@ -72,7 +73,8 @@ export default function LoginOtpScreen() {
     }
   }
 
-  const maskedPhone = `${countryDial} ···· ${phone.slice(-4)}`;
+  // Mask: show last 4 digits of the phone number
+  const maskedPhone = phone ? `···· ${phone.slice(-4)}` : '';
 
   return (
     <KeyboardAwareScrollView
@@ -129,33 +131,20 @@ export default function LoginOtpScreen() {
               <Text className="text-sm font-medium text-[#11181C] dark:text-[#ECEDEE] mb-2">
                 {t('loginOtp.phone')}
               </Text>
-              <View className="flex-row gap-2 mb-6">
-                {/* Country code picker (simplified) */}
-                <View className="border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-3 bg-white dark:bg-[#18191F] justify-center" style={{ height: 52 }}>
-                  <Text className="text-base text-[#11181C] dark:text-[#ECEDEE] font-medium">
-                    {PHONE_COUNTRY_CODES.find((c) => c.dial === countryDial)?.label ?? countryDial}
-                  </Text>
-                </View>
-                <View className="flex-1 border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-4 bg-white dark:bg-[#18191F]" style={{ height: 52 }}>
-                  <TextInput
-                    className="flex-1 text-base text-[#11181C] dark:text-[#ECEDEE]"
-                    style={{ height: 52, textAlignVertical: 'center' }}
-                    placeholder={t('loginOtp.phonePlaceholder')}
-                    placeholderTextColor="#71717A"
-                    value={phone}
-                    onChangeText={setPhone}
-                    keyboardType="phone-pad"
-                    returnKeyType="done"
-                    onSubmitEditing={handleSendCode}
-                  />
-                </View>
+              <View className="mb-6">
+                <PhoneInput
+                  value={phone}
+                  onChange={setPhone}
+                  placeholder={t('loginOtp.phonePlaceholder')}
+                  isDisabled={isLoading}
+                />
               </View>
 
               <Pressable
                 onPress={handleSendCode}
-                disabled={isLoading || !phone.trim()}
+                disabled={isLoading || !canSendCode}
                 className="rounded-2xl py-4 items-center active:opacity-80"
-                style={{ backgroundColor: !phone.trim() ? '#B3B7C3' : Colors.primary }}
+                style={{ backgroundColor: !canSendCode ? '#B3B7C3' : Colors.primary }}
               >
                 {isLoading
                   ? <ActivityIndicator color="white" />
@@ -199,9 +188,9 @@ export default function LoginOtpScreen() {
 
               {/* Resend */}
               <Pressable
-                onPress={cooldown <= 0 ? handleSendCode : undefined}
+                onPress={cooldown <= 0 && !isLoading ? handleSendCode : undefined}
                 className="items-center active:opacity-70"
-                disabled={cooldown > 0}
+                disabled={isLoading || cooldown > 0}
               >
                 <Text className="text-sm" style={{ color: cooldown > 0 ? '#71717A' : Colors.primary }}>
                   {cooldown > 0
