@@ -43,7 +43,7 @@ export default function LoginOtpScreen() {
   const canSendCode = isValidPhone(phone);
 
   async function handleSendCode() {
-    if (!canSendCode) return;
+    if (isLoading || !canSendCode) return;
     setError('');
     setIsLoading(true);
     try {
@@ -188,9 +188,9 @@ export default function LoginOtpScreen() {
 
               {/* Resend */}
               <Pressable
-                onPress={cooldown <= 0 ? handleSendCode : undefined}
+                onPress={cooldown <= 0 && !isLoading ? handleSendCode : undefined}
                 className="items-center active:opacity-70"
-                disabled={cooldown > 0}
+                disabled={isLoading || cooldown > 0}
               >
                 <Text className="text-sm" style={{ color: cooldown > 0 ? '#71717A' : Colors.primary }}>
                   {cooldown > 0
