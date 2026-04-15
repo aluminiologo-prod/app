@@ -83,11 +83,12 @@ jobs:
           retention-days: 7
 
   # ──────────────────────────────────────────────
-  # 4. EAS Build Check (only on PRs to master)
+  # 4. EAS Build
+  #    PR → master      : production profile
+  #    PR → development : development profile
   # ──────────────────────────────────────────────
   eas-build-check:
-    name: EAS Build (development profile)
-    if: github.base_ref == 'master'
+    name: EAS Build (${{ github.base_ref == 'master' && 'production' || 'development' }} profile)
     runs-on: ubuntu-latest
     needs: [lint, unit-tests]
     steps:
@@ -107,5 +108,15 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: EAS Build (no-wait, development profile)
-        run: eas build --platform all --profile development --non-interactive --no-wait
+      - name: EAS Build (no-wait)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_PROFILE: ${{ github.base_ref == 'master' && 'production' || 'development' }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "⚠️  EXPO_TOKEN secret is not configured — skipping EAS build."
+            echo "    Go to Settings → Secrets and variables → Actions and add EXPO_TOKEN."
+            exit 0
+          fi
+          echo "Building with profile: $EAS_PROFILE"
+          eas build --platform all --profile "$EAS_PROFILE" --non-interactive --no-wait
