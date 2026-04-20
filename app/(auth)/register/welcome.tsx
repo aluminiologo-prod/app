@@ -116,51 +116,78 @@ export default function RegisterWelcomeScreen() {
 
       {/* Body */}
       <View style={{ flex: 1, paddingHorizontal: 28, justifyContent: 'center' }}>
-        {/* Halo behind the checkmark */}
+        {/* Halo behind the checkmark — outer container establishes a fixed
+            200×200 coordinate system so the absolute rings can be perfectly
+            centered on the checkmark (flex-center on the parent only affects
+            non-absolute children, which is why the rings drifted before). */}
         <View style={{ alignItems: 'center', marginBottom: 36 }}>
-          <Animated.View
-            style={[
-              {
-                position: 'absolute',
-                width: 200,
-                height: 200,
-                borderRadius: 100,
-                backgroundColor: Colors.brand.orangeSoft,
-              },
-              outerRingStyle,
-            ]}
-          />
-          <Animated.View
-            style={[
-              {
-                position: 'absolute',
-                width: 140,
-                height: 140,
-                borderRadius: 70,
-                borderWidth: 1.5,
-                borderColor: 'rgba(229,120,11,0.28)',
-              },
-              innerRingStyle,
-            ]}
-          />
-          <Animated.View
-            entering={ZoomIn.springify().damping(11).stiffness(140).delay(120)}
+          <View
             style={{
-              width: 84,
-              height: 84,
-              borderRadius: 42,
-              backgroundColor: Colors.brand.orange,
+              width: 200,
+              height: 200,
               alignItems: 'center',
               justifyContent: 'center',
-              shadowColor: Colors.brand.orange,
-              shadowOpacity: 0.35,
-              shadowRadius: 18,
-              shadowOffset: { width: 0, height: 8 },
-              elevation: 8,
             }}
           >
-            <Check size={40} color="#FFFFFF" strokeWidth={3} />
-          </Animated.View>
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                {
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  borderRadius: 100,
+                  backgroundColor: Colors.brand.orangeSoft,
+                },
+                outerRingStyle,
+              ]}
+            />
+            <View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Animated.View
+                style={[
+                  {
+                    width: 140,
+                    height: 140,
+                    borderRadius: 70,
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(229,120,11,0.28)',
+                  },
+                  innerRingStyle,
+                ]}
+              />
+            </View>
+            <Animated.View
+              entering={ZoomIn.springify().damping(11).stiffness(140).delay(120)}
+              style={{
+                width: 84,
+                height: 84,
+                borderRadius: 42,
+                backgroundColor: Colors.brand.orange,
+                alignItems: 'center',
+                justifyContent: 'center',
+                shadowColor: Colors.brand.orange,
+                shadowOpacity: 0.35,
+                shadowRadius: 18,
+                shadowOffset: { width: 0, height: 8 },
+                elevation: 8,
+              }}
+            >
+              <Check size={40} color="#FFFFFF" strokeWidth={3} />
+            </Animated.View>
+          </View>
         </View>
 
         <Animated.View
