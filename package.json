@@ -1,6 +1,6 @@
 {
   "name": "aluminiologo-app",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.ts",
   "scripts": {
     "start": "expo start --dev-client",
@@ -21,6 +21,7 @@
     "clean:install": "rm -rf node_modules/ && rm -rf yarn.lock && rm -rf android && rm -rf .expo && rm -rf ios && npm cache clean --force && yarn cache clean && yarn install"
   },
   "dependencies": {
+    "@expo-google-fonts/fraunces": "^0.4.1",
     "@expo-google-fonts/inter": "^0.4.2",
     "@gorhom/bottom-sheet": "^5.2.9",
     "@supabase/supabase-js": "^2.103.0",

@@ -13,6 +13,15 @@ import api from '../lib/axios';
 import type { AuthUser, AccountType } from '../types/auth';
 import { USER_STORAGE_KEY } from '../config/constants';
 
+export interface LoginResponsePayload {
+  access_token: string;
+  refresh_token: string;
+  account_type: AccountType;
+  staff?: AuthUser | null;
+  user?: AuthUser | null;
+  client?: unknown | null;
+}
+
 interface AuthContextType {
   user: AuthUser | null;
   accountType: AccountType | null;
@@ -23,6 +32,8 @@ interface AuthContextType {
   requestOtp: (phone: string) => Promise<void>;
   loginWithOtp: (phone: string, code: string) => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
+  /** Persist a LoginResponse coming from the public registration flow. */
+  applyLoginResponse: (data: LoginResponsePayload) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -113,6 +124,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await _persistSession({ ...data, user: userData, staff: userData });
   }, [_persistSession]);
 
+  const applyLoginResponse = useCallback(async (data: LoginResponsePayload) => {
+    const userData = (data.user ?? data.staff ?? (data.client as AuthUser | null)) ?? null;
+    await _persistSession({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      account_type: data.account_type,
+      staff: userData,
+      user: userData,
+      client: data.client ?? null,
+    });
+  }, [_persistSession]);
+
   const forgotPassword = useCallback(async (email: string) => {
     await api.post('/auth/forgot-password', { email });
   }, []);
@@ -138,6 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         requestOtp,
         loginWithOtp,
         forgotPassword,
+        applyLoginResponse,
       }}
     >
       {children}
