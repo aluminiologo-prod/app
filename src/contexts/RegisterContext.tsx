@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import type { ClientSegment } from '../services/registration.service';
 
 interface RegisterTokens {
   access_token: string;
@@ -10,7 +9,8 @@ interface RegisterState {
   phone: string;
   firstName: string;
   lastName: string;
-  segment: ClientSegment | null;
+  /** UUID of the selected ClientType (fetched at runtime from `/client-types/public`). */
+  clientTypeId: string | null;
   authUserId: string | null;
   tokens: RegisterTokens | null;
 }
@@ -18,7 +18,7 @@ interface RegisterState {
 interface RegisterContextValue extends RegisterState {
   setPhone: (phone: string) => void;
   setName: (firstName: string, lastName: string) => void;
-  setSegment: (segment: ClientSegment | null) => void;
+  setClientTypeId: (clientTypeId: string | null) => void;
   setVerificationResult: (args: { authUserId: string; tokens: RegisterTokens }) => void;
   reset: () => void;
 }
@@ -27,7 +27,7 @@ const EMPTY_STATE: RegisterState = {
   phone: '',
   firstName: '',
   lastName: '',
-  segment: null,
+  clientTypeId: null,
   authUserId: null,
   tokens: null,
 };
@@ -45,8 +45,8 @@ export function RegisterProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, firstName, lastName }));
   }, []);
 
-  const setSegment = useCallback((segment: ClientSegment | null) => {
-    setState((prev) => ({ ...prev, segment }));
+  const setClientTypeId = useCallback((clientTypeId: string | null) => {
+    setState((prev) => ({ ...prev, clientTypeId }));
   }, []);
 
   const setVerificationResult = useCallback(
@@ -63,11 +63,11 @@ export function RegisterProvider({ children }: { children: ReactNode }) {
       ...state,
       setPhone,
       setName,
-      setSegment,
+      setClientTypeId,
       setVerificationResult,
       reset,
     }),
-    [state, setPhone, setName, setSegment, setVerificationResult, reset],
+    [state, setPhone, setName, setClientTypeId, setVerificationResult, reset],
   );
 
   return <RegisterContext.Provider value={value}>{children}</RegisterContext.Provider>;
