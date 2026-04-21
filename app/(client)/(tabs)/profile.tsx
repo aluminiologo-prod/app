@@ -1,7 +1,6 @@
 import { createElement, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Image,
   Pressable,
   ScrollView,
   Text,
@@ -10,21 +9,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { router } from 'expo-router';
 import {
-  Bell,
   Building2,
-  HelpCircle,
-  Home,
-  LogOut,
+  FileText,
   Mail,
   MapPin,
   Phone,
   Repeat,
-  ShoppingBag,
+  Tag,
   User as UserIcon,
   UserCircle2,
-  FileText,
-  Tag,
 } from 'lucide-react-native';
 import Constants from 'expo-constants';
 import { useAuth } from '../../../src/contexts/AuthContext';
@@ -32,10 +27,11 @@ import { useMyClient } from '../../../src/hooks/queries';
 import { Colors } from '../../../src/theme/colors';
 import { computeCompleteness } from '../../../src/lib/profileCompleteness';
 import { resolveIcon } from '../../../src/lib/iconRegistry';
-import { CompletenessRing } from '../../../src/components/profile/CompletenessRing';
+import { ProfileHeader } from '../../../src/components/profile/ProfileHeader';
+import { AvatarWithRing } from '../../../src/components/profile/AvatarWithRing';
+import { CompletenessCard } from '../../../src/components/profile/CompletenessCard';
 import { ProfileSection } from '../../../src/components/profile/ProfileSection';
 import { ProfileRow } from '../../../src/components/profile/ProfileRow';
-import { ProfileGridTile } from '../../../src/components/profile/ProfileGridTile';
 import { NameSheet } from '../../../src/components/profile/sheets/NameSheet';
 import { PersonTypeSheet } from '../../../src/components/profile/sheets/PersonTypeSheet';
 import { ClientTypeSheet } from '../../../src/components/profile/sheets/ClientTypeSheet';
@@ -44,7 +40,6 @@ import { FiscalDocSheet } from '../../../src/components/profile/sheets/FiscalDoc
 import { AddressSheet } from '../../../src/components/profile/sheets/AddressSheet';
 import { PhoneSheet } from '../../../src/components/profile/sheets/PhoneSheet';
 import { ConfirmModal } from '../../../src/components/ui/ConfirmModal';
-import { toastSuccess } from '../../../src/lib/toast';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '—';
 
@@ -57,6 +52,26 @@ type SheetKey =
   | 'fiscalDoc'
   | 'address';
 
+function getInitials(first: string | null, last: string | null): string {
+  const f = first?.trim()?.[0] ?? '';
+  const l = last?.trim()?.[0] ?? '';
+  const combined = `${f}${l}`.toUpperCase();
+  return combined.length > 0 ? combined : '·';
+}
+
+/**
+ * Joins a list of translated field names with locale-aware conjunction.
+ *   ['email']                     → "email"
+ *   ['email', 'dirección']        → "email y dirección"
+ *   ['email', 'cédula', 'dir.']   → "email, cédula y dir."
+ */
+function joinFields(names: string[], conjunction: string): string {
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]}${conjunction}${names[1]}`;
+  return `${names.slice(0, -1).join(', ')}${conjunction}${names[names.length - 1]}`;
+}
+
 export default function ClientProfileScreen() {
   const { t } = useTranslation('profile');
   const { accountType, logout, chooseFlow } = useAuth();
@@ -68,7 +83,7 @@ export default function ClientProfileScreen() {
   const completeness = useMemo(() => computeCompleteness(client), [client]);
 
   const bg = isDark ? '#0F1117' : Colors.brand.cream;
-  const headerTitleColor = isDark ? '#ECEDEE' : Colors.brand.navy;
+  const titleColor = isDark ? '#ECEDEE' : Colors.brand.navy;
   const subtleText = isDark ? '#9BA1B0' : Colors.brand.navyMuted;
 
   if (isLoading) {
@@ -96,7 +111,7 @@ export default function ClientProfileScreen() {
             style={{
               fontFamily: 'Inter_600SemiBold',
               fontSize: 16,
-              color: Colors.brand.navy,
+              color: titleColor,
               textAlign: 'center',
               marginBottom: 12,
             }}
@@ -124,50 +139,49 @@ export default function ClientProfileScreen() {
   const fullName =
     [client.first_name, client.last_name].filter(Boolean).join(' ').trim() ||
     t('hero.noName');
-
+  const initials = getInitials(client.first_name, client.last_name);
   const memberSinceYear = new Date(client.created_at).getFullYear();
   const ClientTypeIcon = resolveIcon(client.client_type?.icon_name);
+
+  const missingCount = completeness.missingKeys.length;
+  const completenessBody =
+    completeness.percent === 100
+      ? t('completeness.doneSubtitle')
+      : `${t('completeness.missingIntro', { count: missingCount })} ${t(
+          'completeness.missingFields',
+          {
+            fields: joinFields(
+              completeness.missingKeys.map((k) => t(`missingFieldName.${k}`)),
+              t('listConjunction'),
+            ),
+          },
+        )}`;
+
+  const completenessHeadline =
+    completeness.percent === 100
+      ? t('completeness.done')
+      : t('completeness.headline', { percent: completeness.percent });
 
   const handleSwitchFlow = async () => {
     await chooseFlow('admin');
   };
 
+  // Client-only accounts have nothing to go "back" to (they land here from /).
+  // BOTH-users reached this screen by picking a flow — tapping back should
+  // take them to the flow-choice modal again.
+  const canGoBack = accountType === 'BOTH';
+  const handleBack = canGoBack ? () => router.replace('/flow-choice') : undefined;
+
   return (
     <View style={{ flex: 1, backgroundColor: bg }}>
       <SafeAreaView edges={['top']}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 20,
-            paddingTop: 4,
-            paddingBottom: 10,
-          }}
-        >
-          <Image
-            source={require('../../../assets/logo-light.png')}
-            resizeMode="contain"
-            style={{ width: 132, height: 28 }}
-            accessibilityIgnoresInvertColors
-          />
-          <Pressable
-            onPress={() => setConfirmLogout(true)}
-            accessibilityRole="button"
-            accessibilityLabel={t('header.logout')}
-            hitSlop={10}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              backgroundColor: isDark ? '#20222A' : Colors.brand.creamSoft,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <LogOut size={18} color={subtleText} />
-          </Pressable>
-        </View>
+        <ProfileHeader
+          title={t('header.title')}
+          onBack={handleBack}
+          onLogout={() => setConfirmLogout(true)}
+          logoutLabel={t('header.logout')}
+          backLabel={t('header.back')}
+        />
       </SafeAreaView>
 
       <ScrollView
@@ -175,124 +189,89 @@ export default function ClientProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Hero */}
-        <View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
-          <View
+        <View style={{ alignItems: 'center', paddingTop: 12, paddingHorizontal: 24 }}>
+          <AvatarWithRing
+            initials={initials}
+            percent={completeness.percent}
+            size={132}
+          />
+
+          <Text
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 16,
+              fontFamily: 'Fraunces_700Bold',
+              fontSize: 26,
+              lineHeight: 32,
+              color: titleColor,
+              textAlign: 'center',
+              marginTop: 18,
             }}
+            numberOfLines={1}
           >
-            <CompletenessRing value={completeness.percent} size={96} />
-            <View style={{ flex: 1 }}>
+            {fullName}
+          </Text>
+
+          <Text
+            style={{
+              fontFamily: 'Inter_400Regular',
+              fontSize: 13,
+              color: subtleText,
+              marginTop: 6,
+              textAlign: 'center',
+            }}
+            numberOfLines={1}
+          >
+            {client.phone ? `${client.phone}  ·  ` : ''}
+            {t('hero.memberSince', { year: memberSinceYear })}
+          </Text>
+
+          {client.client_type ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 12,
+                paddingHorizontal: 14,
+                paddingVertical: 6,
+                borderRadius: 999,
+                backgroundColor: Colors.brand.orangeSoft,
+                gap: 8,
+              }}
+            >
+              {createElement(ClientTypeIcon, {
+                size: 14,
+                color: Colors.brand.orange,
+                strokeWidth: 2.2,
+              })}
               <Text
                 style={{
-                  fontFamily: 'Fraunces_700Bold',
-                  fontSize: 22,
-                  color: headerTitleColor,
-                  marginBottom: 4,
-                }}
-                numberOfLines={1}
-              >
-                {fullName}
-              </Text>
-              {client.phone ? (
-                <Text
-                  style={{
-                    fontFamily: 'Inter_500Medium',
-                    fontSize: 13,
-                    color: subtleText,
-                  }}
-                >
-                  {client.phone}
-                </Text>
-              ) : null}
-              <Text
-                style={{
-                  fontFamily: 'Inter_400Regular',
+                  fontFamily: 'Inter_700Bold',
                   fontSize: 12,
-                  color: subtleText,
-                  marginTop: 4,
+                  color: Colors.brand.orange,
+                  letterSpacing: 0.4,
                 }}
               >
-                {t('hero.memberSince', { year: memberSinceYear })}
+                {client.client_type.name}
               </Text>
-
-              {client.client_type ? (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    alignSelf: 'flex-start',
-                    marginTop: 8,
-                    paddingHorizontal: 10,
-                    paddingVertical: 4,
-                    borderRadius: 999,
-                    backgroundColor: Colors.brand.orangeSoft,
-                    gap: 6,
-                  }}
-                >
-                  {createElement(ClientTypeIcon, {
-                    size: 14,
-                    color: Colors.brand.orange,
-                    strokeWidth: 2.2,
-                  })}
-                  <Text
-                    style={{
-                      fontFamily: 'Inter_600SemiBold',
-                      fontSize: 11,
-                      color: Colors.brand.orange,
-                      letterSpacing: 0.4,
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {client.client_type.name}
-                  </Text>
-                </View>
-              ) : null}
             </View>
-          </View>
-
-          {/* Completeness card */}
-          <View
-            style={{
-              marginTop: 20,
-              padding: 16,
-              borderRadius: 16,
-              backgroundColor: Colors.brand.orangeSoft,
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: 'Inter_700Bold',
-                fontSize: 14,
-                color: Colors.brand.navy,
-                marginBottom: 4,
-              }}
-            >
-              {completeness.percent === 100
-                ? t('completeness.done')
-                : t('completeness.title', { percent: completeness.percent })}
-            </Text>
-            <Text
-              style={{
-                fontFamily: 'Inter_400Regular',
-                fontSize: 13,
-                lineHeight: 18,
-                color: Colors.brand.navyMuted,
-              }}
-            >
-              {completeness.percent === 100
-                ? t('completeness.doneSubtitle')
-                : t('completeness.fieldsRemaining', {
-                    count: completeness.total - completeness.filled,
-                  })}
-            </Text>
-          </View>
+          ) : null}
         </View>
 
+        <CompletenessCard
+          percent={completeness.percent}
+          headline={completenessHeadline}
+          body={completenessBody}
+          complete={completeness.percent === 100}
+        />
+
         {/* Personal */}
-        <ProfileSection title={t('sections.personal')}>
+        <ProfileSection
+          title={t('sections.personal')}
+          counter={t('sectionCounter', {
+            filled: completeness.sections.personal.filled,
+            total: completeness.sections.personal.total,
+          })}
+          counterComplete={completeness.sections.personal.complete}
+        >
           <ProfileRow
             icon={UserIcon}
             label={t('rows.name')}
@@ -305,9 +284,7 @@ export default function ClientProfileScreen() {
             icon={UserCircle2}
             label={t('rows.personType')}
             value={
-              client.person_type
-                ? t(`rows.personType.${client.person_type}`)
-                : null
+              client.person_type ? t(`rows.personType.${client.person_type}`) : null
             }
             emptyLabel={t('rows.empty')}
             onPress={() => setOpenSheet('personType')}
@@ -323,13 +300,22 @@ export default function ClientProfileScreen() {
         </ProfileSection>
 
         {/* Contact */}
-        <ProfileSection title={t('sections.contact')}>
+        <ProfileSection
+          title={t('sections.contact')}
+          counter={t('sectionCounter', {
+            filled: completeness.sections.contact.filled,
+            total: completeness.sections.contact.total,
+          })}
+          counterComplete={completeness.sections.contact.complete}
+        >
           <ProfileRow
             icon={Phone}
             label={t('rows.phone')}
             value={client.phone}
             emptyLabel={t('rows.empty')}
             onPress={() => setOpenSheet('phone')}
+            verified={!!client.phone}
+            verifiedLabel={t('verified')}
             isFirst
           />
           <ProfileRow
@@ -343,7 +329,14 @@ export default function ClientProfileScreen() {
         </ProfileSection>
 
         {/* Billing */}
-        <ProfileSection title={t('sections.billing')}>
+        <ProfileSection
+          title={t('sections.billing')}
+          counter={t('sectionCounter', {
+            filled: completeness.sections.billing.filled,
+            total: completeness.sections.billing.total,
+          })}
+          counterComplete={completeness.sections.billing.complete}
+        >
           <ProfileRow
             icon={FileText}
             label={t('rows.fiscalDoc')}
@@ -365,51 +358,6 @@ export default function ClientProfileScreen() {
             isLast
           />
         </ProfileSection>
-
-        {/* Application grid */}
-        <View style={{ marginTop: 22, paddingHorizontal: 20 }}>
-          <Text
-            style={{
-              fontFamily: 'Inter_600SemiBold',
-              fontSize: 11,
-              letterSpacing: 1,
-              textTransform: 'uppercase',
-              color: subtleText,
-              paddingHorizontal: 0,
-              marginBottom: 10,
-            }}
-          >
-            {t('sections.app')}
-          </Text>
-          <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
-            <ProfileGridTile
-              icon={ShoppingBag}
-              label={t('grid.orders')}
-              badge={t('grid.comingSoon')}
-              onPress={() => toastSuccess(t('grid.comingSoon'))}
-            />
-            <ProfileGridTile
-              icon={Home}
-              label={t('grid.addresses')}
-              badge={t('grid.comingSoon')}
-              onPress={() => toastSuccess(t('grid.comingSoon'))}
-            />
-          </View>
-          <View style={{ flexDirection: 'row', gap: 12 }}>
-            <ProfileGridTile
-              icon={Bell}
-              label={t('grid.notifications')}
-              badge={t('grid.comingSoon')}
-              onPress={() => toastSuccess(t('grid.comingSoon'))}
-            />
-            <ProfileGridTile
-              icon={HelpCircle}
-              label={t('grid.help')}
-              badge={t('grid.comingSoon')}
-              onPress={() => toastSuccess(t('grid.comingSoon'))}
-            />
-          </View>
-        </View>
 
         {/* Switch to admin (only for BOTH) */}
         {accountType === 'BOTH' ? (
@@ -446,7 +394,7 @@ export default function ClientProfileScreen() {
                 style={{
                   fontFamily: 'Inter_600SemiBold',
                   fontSize: 14,
-                  color: isDark ? '#ECEDEE' : Colors.brand.navy,
+                  color: titleColor,
                 }}
               >
                 {t('header.switchFlow')}
@@ -456,7 +404,6 @@ export default function ClientProfileScreen() {
           </Pressable>
         ) : null}
 
-        {/* Version */}
         <Text
           style={{
             fontFamily: 'Inter_400Regular',

@@ -10,13 +10,16 @@
     "noName": "Agrega tu nombre"
   },
   "completeness": {
-    "title": "Tu perfil está {{percent}}% completo",
-    "subtitle": "Completa los datos para recibir mejores ofertas y agilizar tus compras.",
-    "fieldsRemaining_one": "Falta {{count}} campo",
-    "fieldsRemaining_other": "Faltan {{count}} campos",
+    "headline": "Perfil al {{percent}}%",
+    "missingIntro_one": "Te falta <b>{{count}} dato</b> para completar tu perfil.",
+    "missingIntro_other": "Te faltan <b>{{count}} datos</b> para completar tu perfil.",
+    "missingFields": "Necesitas {{fields}}.",
     "done": "Perfil completo",
     "doneSubtitle": "Gracias por mantener tu información al día."
   },
+  "sectionCounter": "{{filled}}/{{total}} completos",
+  "verified": "Verificado",
+  "listConjunction": " y ",
   "sections": {
     "personal": "Datos Personales",
     "contact": "Contacto",
@@ -34,6 +37,15 @@
     "empty": "Agregar",
     "personType.INDIVIDUAL": "Persona natural",
     "personType.BUSINESS": "Empresa"
+  },
+  "missingFieldName": {
+    "name": "nombre",
+    "personType": "tipo de persona",
+    "clientType": "tipo de cliente",
+    "phone": "teléfono",
+    "email": "correo",
+    "fiscalDoc": "cédula/RIF",
+    "address": "dirección"
   },
   "grid": {
     "orders": "Mis pedidos",

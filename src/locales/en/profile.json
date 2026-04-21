@@ -10,13 +10,16 @@
     "noName": "Add your name"
   },
   "completeness": {
-    "title": "Your profile is {{percent}}% complete",
-    "subtitle": "Fill in the details below to unlock better offers and faster checkout.",
-    "fieldsRemaining_one": "{{count}} field left",
-    "fieldsRemaining_other": "{{count}} fields left",
+    "headline": "Profile at {{percent}}%",
+    "missingIntro_one": "You're <b>{{count}} field</b> away from completing your profile.",
+    "missingIntro_other": "You're <b>{{count}} fields</b> away from completing your profile.",
+    "missingFields": "You still need {{fields}}.",
     "done": "Profile complete",
     "doneSubtitle": "Thanks for keeping your information up to date."
   },
+  "sectionCounter": "{{filled}}/{{total}} complete",
+  "verified": "Verified",
+  "listConjunction": " and ",
   "sections": {
     "personal": "Personal Info",
     "contact": "Contact",
@@ -34,6 +37,15 @@
     "empty": "Add",
     "personType.INDIVIDUAL": "Individual",
     "personType.BUSINESS": "Business"
+  },
+  "missingFieldName": {
+    "name": "name",
+    "personType": "person type",
+    "clientType": "client type",
+    "phone": "phone",
+    "email": "email",
+    "fiscalDoc": "fiscal document",
+    "address": "address"
   },
   "grid": {
     "orders": "My orders",

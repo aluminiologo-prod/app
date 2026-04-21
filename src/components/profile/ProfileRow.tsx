@@ -1,6 +1,6 @@
 import { Pressable, Text, View, useColorScheme } from 'react-native';
 import type { LucideIcon } from 'lucide-react-native';
-import { ChevronRight } from 'lucide-react-native';
+import { Check, ChevronRight } from 'lucide-react-native';
 import { Colors } from '../../theme/colors';
 
 interface Props {
@@ -11,12 +11,19 @@ interface Props {
   onPress: () => void;
   isFirst?: boolean;
   isLast?: boolean;
+  /** When set, renders a small green "verified" tag next to the label. */
+  verified?: boolean;
+  verifiedLabel?: string;
 }
 
 /**
- * Single row inside a profile section. Tappable — opens the matching edit
- * sheet. When `value` is null/empty, renders a muted "Add" tag instead of an
- * empty space so the user always sees an actionable affordance.
+ * One line inside a section card. Horizontal composition:
+ *   [ soft-orange icon ]  [ LABEL ]    [ chevron ]
+ *                         [ value ]
+ *
+ * Tappable — opens the matching edit sheet. When `value` is empty, renders
+ * a muted "Add" affordance in the brand orange so the row always feels
+ * actionable.
  */
 export function ProfileRow({
   icon: Icon,
@@ -26,12 +33,15 @@ export function ProfileRow({
   onPress,
   isFirst = false,
   isLast = false,
+  verified = false,
+  verifiedLabel,
 }: Props) {
   const isDark = useColorScheme() === 'dark';
   const borderColor = isDark ? '#272831' : Colors.brand.creamSoft;
-  const labelColor = isDark ? '#C7CBD4' : Colors.brand.navyMuted;
+  const labelColor = isDark ? '#9BA1B0' : Colors.brand.navyMuted;
   const valueColor = isDark ? '#ECEDEE' : Colors.brand.navy;
   const iconBg = isDark ? '#20222A' : Colors.brand.orangeSoft;
+  const chevronColor = isDark ? '#71717A' : Colors.brand.navyMuted;
   const hasValue = !!(value && value.trim().length > 0);
 
   return (
@@ -47,42 +57,69 @@ export function ProfileRow({
         borderTopWidth: isFirst ? 0 : 1,
         borderTopColor: borderColor,
         opacity: pressed ? 0.6 : 1,
-        borderTopLeftRadius: isFirst ? 16 : 0,
-        borderTopRightRadius: isFirst ? 16 : 0,
-        borderBottomLeftRadius: isLast ? 16 : 0,
-        borderBottomRightRadius: isLast ? 16 : 0,
       })}
     >
       <View
         style={{
-          width: 36,
-          height: 36,
-          borderRadius: 10,
+          width: 40,
+          height: 40,
+          borderRadius: 12,
           backgroundColor: iconBg,
           alignItems: 'center',
           justifyContent: 'center',
-          marginRight: 12,
+          marginRight: 14,
         }}
       >
         <Icon size={18} color={Colors.brand.orange} strokeWidth={2} />
       </View>
       <View style={{ flex: 1, marginRight: 8 }}>
-        <Text
+        <View
           style={{
-            fontFamily: 'Inter_500Medium',
-            fontSize: 12,
-            color: labelColor,
-            letterSpacing: 0.2,
+            flexDirection: 'row',
+            alignItems: 'center',
             marginBottom: 2,
           }}
-          numberOfLines={1}
         >
-          {label}
-        </Text>
+          <Text
+            style={{
+              fontFamily: 'Inter_500Medium',
+              fontSize: 11,
+              letterSpacing: 1,
+              textTransform: 'uppercase',
+              color: labelColor,
+            }}
+            numberOfLines={1}
+          >
+            {label}
+          </Text>
+          {verified ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 3,
+                marginLeft: 8,
+              }}
+            >
+              <Check size={11} color={Colors.success} strokeWidth={3} />
+              <Text
+                style={{
+                  fontFamily: 'Inter_700Bold',
+                  fontSize: 9.5,
+                  letterSpacing: 0.6,
+                  textTransform: 'uppercase',
+                  color: Colors.success,
+                }}
+              >
+                {verifiedLabel}
+              </Text>
+            </View>
+          ) : null}
+        </View>
         {hasValue ? (
           <Text
             style={{
-              fontFamily: 'Inter_600SemiBold',
+              fontFamily: 'Inter_700Bold',
               fontSize: 15,
               color: valueColor,
             }}
@@ -93,7 +130,7 @@ export function ProfileRow({
         ) : (
           <Text
             style={{
-              fontFamily: 'Inter_500Medium',
+              fontFamily: 'Inter_600SemiBold',
               fontSize: 13,
               color: Colors.brand.orange,
             }}
@@ -102,7 +139,7 @@ export function ProfileRow({
           </Text>
         )}
       </View>
-      <ChevronRight size={18} color={isDark ? '#71717A' : Colors.brand.navyMuted} />
+      <ChevronRight size={18} color={chevronColor} />
     </Pressable>
   );
 }
