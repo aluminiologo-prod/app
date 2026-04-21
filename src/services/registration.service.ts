@@ -1,8 +1,6 @@
 import api from '../lib/axios';
 import type { LoginResponsePayload } from '../contexts/AuthContext';
 
-export type ClientSegment = 'INSTALLER' | 'GLAZIER' | 'WHOLESALE' | 'PERSONAL';
-
 export interface VerifyRegistrationOtpResult {
   /** When the phone is already tied to a Client, the backend returns the full login response with this flag. */
   is_existing_user?: boolean;
@@ -43,7 +41,7 @@ export async function completeRegistration(args: {
   phone: string;
   firstName: string;
   lastName: string;
-  segment: ClientSegment | null;
+  clientTypeId: string;
 }): Promise<LoginResponsePayload> {
   const { data } = await api.post(
     '/auth/register/complete',
@@ -51,7 +49,7 @@ export async function completeRegistration(args: {
       phone: args.phone,
       first_name: args.firstName,
       last_name: args.lastName,
-      segment: args.segment,
+      client_type_id: args.clientTypeId,
       refresh_token: args.refreshToken,
     },
     { headers: { Authorization: `Bearer ${args.bearerToken}` } },

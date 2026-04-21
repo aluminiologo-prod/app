@@ -2,6 +2,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getTransfer } from '../services/transfers.service';
 import { getStores } from '../services/stores.service';
 import { listCountries } from '../services/countries.service';
+import { getPublicClientTypes } from '../services/client-types.service';
 import { queryKeys } from '../lib/queryKeys';
 
 export function useTransfer(id: string | null, options?: { enabled?: boolean }) {
@@ -18,6 +19,19 @@ export function useStoresList(params?: { limit?: number }) {
     queryKey: queryKeys.stores.list(params ?? {}),
     queryFn: () => getStores({ limit: params?.limit ?? 100 }),
     staleTime: 10 * 60 * 1000, // 10 min
+    placeholderData: keepPreviousData,
+  });
+}
+
+/**
+ * Unauthenticated list of active client types for the public registration
+ * wizard. Cached for 10 min so switching between wizard steps doesn't refetch.
+ */
+export function usePublicClientTypesList() {
+  return useQuery({
+    queryKey: ['client-types', 'public'],
+    queryFn: getPublicClientTypes,
+    staleTime: 10 * 60 * 1000,
     placeholderData: keepPreviousData,
   });
 }

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
-import { Wrench, LayoutGrid, Package, User } from 'lucide-react-native';
+import { AlertCircle } from 'lucide-react-native';
 import { StepContainer } from '../../../src/components/register/StepContainer';
 import { SerifHeading } from '../../../src/components/register/SerifHeading';
 import { PrimaryCta } from '../../../src/components/register/PrimaryCta';
@@ -11,21 +11,11 @@ import { SelectableCard } from '../../../src/components/register/SelectableCard'
 import { ConfirmModal } from '../../../src/components/ui/ConfirmModal';
 import { useRegister } from '../../../src/contexts/RegisterContext';
 import { useAuth } from '../../../src/contexts/AuthContext';
-import { completeRegistration, type ClientSegment } from '../../../src/services/registration.service';
+import { usePublicClientTypesList } from '../../../src/hooks/queries';
+import { completeRegistration } from '../../../src/services/registration.service';
+import { resolveIcon } from '../../../src/lib/iconRegistry';
 import { toastApiError, toastSuccess } from '../../../src/lib/toast';
 import { Colors } from '../../../src/theme/colors';
-
-const SEGMENT_OPTIONS: {
-  value: ClientSegment;
-  icon: typeof Wrench;
-  titleKey: string;
-  descKey: string;
-}[] = [
-  { value: 'INSTALLER', icon: Wrench,     titleKey: 'installer.title', descKey: 'installer.description' },
-  { value: 'GLAZIER',   icon: LayoutGrid, titleKey: 'glazier.title',   descKey: 'glazier.description'   },
-  { value: 'WHOLESALE', icon: Package,    titleKey: 'wholesale.title', descKey: 'wholesale.description' },
-  { value: 'PERSONAL',  icon: User,       titleKey: 'personal.title',  descKey: 'personal.description'  },
-];
 
 export default function RegisterSegmentScreen() {
   const { t } = useTranslation('auth');
@@ -33,9 +23,9 @@ export default function RegisterSegmentScreen() {
     phone,
     firstName,
     lastName,
-    segment,
+    clientTypeId,
     tokens,
-    setSegment,
+    setClientTypeId,
     reset,
   } = useRegister();
   const { applyLoginResponse } = useAuth();
@@ -43,10 +33,17 @@ export default function RegisterSegmentScreen() {
   const [loading, setLoading] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
 
-  const canContinue = segment !== null;
+  const {
+    data: clientTypes,
+    isLoading: typesLoading,
+    isError: typesError,
+    refetch,
+  } = usePublicClientTypesList();
+
+  const canContinue = clientTypeId !== null;
 
   const handleComplete = async () => {
-    if (!canContinue || loading) return;
+    if (!canContinue || loading || !clientTypeId) return;
     if (!tokens) {
       toastApiError(new Error('Missing registration session. Please start over.'));
       router.replace('/(auth)/register/phone');
@@ -60,7 +57,7 @@ export default function RegisterSegmentScreen() {
         phone,
         firstName,
         lastName,
-        segment,
+        clientTypeId,
       });
       await applyLoginResponse(response);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -129,29 +126,71 @@ export default function RegisterSegmentScreen() {
           {t('register.step4.subtitle')}
         </Text>
 
-        <View
-          style={{
-            marginTop: 32,
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: 12,
-          }}
-        >
-          {SEGMENT_OPTIONS.map((opt) => (
-            <View
-              key={opt.value}
-              style={{ width: '47%', flexGrow: 1 }}
-            >
-              <SelectableCard
-                icon={opt.icon}
-                title={t(`register.step4.segments.${opt.titleKey}`)}
-                description={t(`register.step4.segments.${opt.descKey}`)}
-                selected={segment === opt.value}
-                onPress={() => setSegment(segment === opt.value ? null : opt.value)}
-              />
+        {typesLoading ? (
+          <View style={{ marginTop: 48, alignItems: 'center' }}>
+            <ActivityIndicator color={Colors.brand.orange} size="large" />
+          </View>
+        ) : typesError || !clientTypes ? (
+          <View
+            style={{
+              marginTop: 36,
+              padding: 18,
+              borderRadius: 14,
+              backgroundColor: Colors.brand.creamSoft,
+              flexDirection: 'row',
+              gap: 12,
+              alignItems: 'flex-start',
+            }}
+          >
+            <AlertCircle size={20} color={Colors.danger} strokeWidth={2} />
+            <View style={{ flex: 1 }}>
+              <Text
+                style={{
+                  fontFamily: 'Inter_600SemiBold',
+                  fontSize: 14,
+                  color: Colors.brand.navy,
+                  marginBottom: 4,
+                }}
+              >
+                {t('register.step4.loadError')}
+              </Text>
+              <Text
+                onPress={() => refetch()}
+                style={{
+                  fontFamily: 'Inter_600SemiBold',
+                  fontSize: 13,
+                  color: Colors.brand.orange,
+                  marginTop: 4,
+                }}
+              >
+                {t('register.step4.retry')}
+              </Text>
             </View>
-          ))}
-        </View>
+          </View>
+        ) : (
+          <View
+            style={{
+              marginTop: 32,
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: 12,
+            }}
+          >
+            {clientTypes.map((ct) => (
+              <View key={ct.id} style={{ width: '47%', flexGrow: 1 }}>
+                <SelectableCard
+                  icon={resolveIcon(ct.icon_name)}
+                  title={ct.name}
+                  description={ct.description ?? ''}
+                  selected={clientTypeId === ct.id}
+                  onPress={() =>
+                    setClientTypeId(clientTypeId === ct.id ? null : ct.id)
+                  }
+                />
+              </View>
+            ))}
+          </View>
+        )}
       </StepContainer>
 
       <ConfirmModal
