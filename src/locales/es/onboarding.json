@@ -1,0 +1,48 @@
+{
+  "skip": "Saltar",
+  "slide1": {
+    "eyebrow": "Bienvenido",
+    "titleLeading": "Hola,",
+    "titleItalic": "nos alegra",
+    "titleTrailing": " verte por aquí.",
+    "body": "Esta es tu nueva casa digital como cliente de AluminioLogo. Déjanos mostrarte lo que viene."
+  },
+  "slide2": {
+    "eyebrow": "Acceso desbloqueado",
+    "titleLeading": "Acabas de\ndesbloquear una",
+    "titleItalic": "nueva experiencia",
+    "titleTrailing": ".",
+    "body": "Una forma más rápida, cercana y profesional de trabajar con nosotros."
+  },
+  "slide3": {
+    "badge": "Muy pronto · 01",
+    "titleLeading": "Calculadora de",
+    "titleItalic": "materiales",
+    "titleTrailing": ".",
+    "body": "Ingresa las medidas de tu ventana o sistema y obtén al instante la lista exacta de perfiles, vidrios y accesorios que necesitas.",
+    "soon": "Próximamente"
+  },
+  "slide4": {
+    "badge": "Muy pronto · 02",
+    "titleLeading": "Tienda",
+    "titleItalic": "online",
+    "titleTrailing": ", 24/7.",
+    "body": "Compra perfiles, vidrios y accesorios desde tu teléfono. Revisa disponibilidad en tiempo real y coordina tu retiro o entrega.",
+    "soon": "Próximamente"
+  },
+  "slide5": {
+    "badge": "Muy pronto · 03",
+    "titleLeading": "Club",
+    "titleItalic": "AluminioLogo",
+    "titleTrailing": ".",
+    "body": "Beneficios exclusivos, precios preferenciales, acceso anticipado a novedades y un trato diseñado para profesionales como tú.",
+    "soon": "Próximamente"
+  },
+  "slide6": {
+    "titleLeading": "Esto",
+    "titleItalic": "apenas comienza",
+    "titleTrailing": ".",
+    "body": "Tu cuenta está lista. Empieza a explorar y acompáñanos en este camino.",
+    "cta": "Comenzar"
+  }
+}

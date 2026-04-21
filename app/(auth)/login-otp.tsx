@@ -1,231 +1,413 @@
-import { useState, useEffect, useRef } from 'react';
-import {
-  View, Text, TextInput, Pressable,
-  ActivityIndicator, Image, useColorScheme,
-} from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useEffect, useRef, useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { CheckCircle2, Info } from 'lucide-react-native';
 import Constants from 'expo-constants';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Colors } from '../../src/theme/colors';
 import { PhoneInput } from '../../src/components/auth/PhoneInput';
 import { isValidPhone } from '../../src/lib/phone';
+import { StepContainer } from '../../src/components/register/StepContainer';
+import { SerifHeading } from '../../src/components/register/SerifHeading';
+import { PrimaryCta } from '../../src/components/register/PrimaryCta';
+import { OtpBoxesInput } from '../../src/components/register/OtpBoxesInput';
+import { toastApiError } from '../../src/lib/toast';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '—';
-
-const LOGO_LIGHT = require('../../assets/logo-light.png');
-const LOGO_DARK  = require('../../assets/logo-dark.png');
 const OTP_COOLDOWN = 30;
+const CODE_LENGTH = 6;
 
 export default function LoginOtpScreen() {
-  const { t } = useTranslation('auth');
   const { requestOtp, loginWithOtp } = useAuth();
-  const isDark = useColorScheme() === 'dark';
 
   const [step, setStep] = useState<'phone' | 'code'>('phone');
-  // phone stores the full E.164 string ("+584141234567") or ""
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(false);
   const [cooldown, setCooldown] = useState(0);
-  const codeInputRef = useRef<TextInput>(null);
+  const otpResetRef = useRef(0);
 
-  // Countdown timer
   useEffect(() => {
     if (cooldown <= 0) return;
     const timer = setInterval(() => setCooldown((c) => c - 1), 1000);
     return () => clearInterval(timer);
   }, [cooldown]);
 
+  useEffect(() => {
+    if (!error) return;
+    const t2 = setTimeout(() => setError(false), 1400);
+    return () => clearTimeout(t2);
+  }, [error]);
+
   const canSendCode = isValidPhone(phone);
+  const canVerify = code.length === CODE_LENGTH;
 
   async function handleSendCode() {
     if (isLoading || !canSendCode) return;
-    setError('');
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       await requestOtp(phone);
       setStep('code');
       setCooldown(OTP_COOLDOWN);
-      setTimeout(() => codeInputRef.current?.focus(), 300);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send code');
+      toastApiError(err);
     } finally {
       setIsLoading(false);
     }
   }
 
   async function handleVerify() {
-    if (code.length !== 6) return;
-    setError('');
-    setIsLoading(true);
+    if (!canVerify || isLoading) return;
     try {
+      setIsLoading(true);
       await loginWithOtp(phone, code);
-      router.replace('/(app)/(tabs)/in-transit');
+      router.replace('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('loginOtp.invalidCode'));
+      setError(true);
       setCode('');
+      otpResetRef.current += 1;
+      toastApiError(err);
     } finally {
       setIsLoading(false);
     }
   }
 
-  // Mask: show last 4 digits of the phone number
-  const maskedPhone = phone ? `···· ${phone.slice(-4)}` : '';
+  async function handleResend() {
+    if (cooldown > 0 || isLoading) return;
+    try {
+      await requestOtp(phone);
+      setCooldown(OTP_COOLDOWN);
+    } catch (err) {
+      toastApiError(err);
+    }
+  }
+
+  if (step === 'phone') {
+    return <PhoneStep
+      phone={phone}
+      onPhoneChange={setPhone}
+      loading={isLoading}
+      canSendCode={canSendCode}
+      onSendCode={handleSendCode}
+    />;
+  }
 
   return (
-    <KeyboardAwareScrollView
-      style={{ flex: 1, backgroundColor: isDark ? '#0F1117' : '#FFFFFF' }}
-      contentContainerStyle={{ flexGrow: 1 }}
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
-      enableOnAndroid
-      extraScrollHeight={24}
-      enableAutomaticScroll
-    >
-        <View className="flex-1 justify-center px-6 py-12">
-          {/* Logo */}
-          <Image
-            source={isDark ? LOGO_DARK : LOGO_LIGHT}
-            style={{ width: 210, height: 55, marginBottom: 24 }}
-            resizeMode="contain"
-          />
+    <CodeStep
+      phone={phone}
+      code={code}
+      onCodeChange={setCode}
+      onVerify={handleVerify}
+      onResend={handleResend}
+      onBack={() => {
+        setStep('phone');
+        setCode('');
+        setCooldown(0);
+      }}
+      loading={isLoading}
+      canVerify={canVerify}
+      cooldown={cooldown}
+      hasError={error}
+      resetKey={otpResetRef.current}
+    />
+  );
+}
 
-          {/* Back button — only visible when on OTP code step */}
-          {step === 'code' && (
-            <Pressable
-              onPress={() => setStep('phone')}
-              className="flex-row items-center gap-1 mb-8 active:opacity-70 self-start"
+// ─── Phone step ────────────────────────────────────────────────────────────────
+interface PhoneStepProps {
+  phone: string;
+  onPhoneChange: (v: string) => void;
+  loading: boolean;
+  canSendCode: boolean;
+  onSendCode: () => void;
+}
+
+function PhoneStep({ phone, onPhoneChange, loading, canSendCode, onSendCode }: PhoneStepProps) {
+  const { t } = useTranslation('auth');
+
+  const footer = (
+    <View>
+      <PrimaryCta
+        label={t('loginOtp.sendCode')}
+        onPress={onSendCode}
+        disabled={!canSendCode}
+        loading={loading}
+      />
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 18 }}>
+        <View style={{ flex: 1, height: 1, backgroundColor: Colors.brand.creamSoft }} />
+        <Text
+          style={{
+            fontFamily: 'Inter_500Medium',
+            fontSize: 12,
+            color: Colors.brand.navyMuted,
+            textTransform: 'uppercase',
+            letterSpacing: 1.4,
+          }}
+        >
+          {t('loginOtp.orDivider')}
+        </Text>
+        <View style={{ flex: 1, height: 1, backgroundColor: Colors.brand.creamSoft }} />
+      </View>
+
+      <View
+        style={{
+          marginTop: 20,
+          borderRadius: 999,
+          backgroundColor: 'transparent',
+          overflow: 'hidden',
+        }}
+      >
+        <Pressable
+          onPress={() => router.push('/(auth)/login')}
+          accessibilityRole="button"
+          style={({ pressed }) => ({
+            paddingVertical: 16,
+            paddingHorizontal: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: pressed ? 0.6 : 1,
+          })}
+        >
+          <Text
+            style={{
+              fontFamily: 'Inter_600SemiBold',
+              fontSize: 14,
+              color: Colors.brand.navy,
+              letterSpacing: 0.4,
+              textAlign: 'center',
+            }}
+          >
+            {t('loginOtp.signInWithEmail')}
+          </Text>
+        </Pressable>
+      </View>
+
+      <Pressable
+        onPress={() => router.replace('/(auth)/register/phone')}
+        accessibilityRole="button"
+        style={{ alignSelf: 'center', marginTop: 18, paddingVertical: 6 }}
+        hitSlop={10}
+      >
+        <Text
+          style={{
+            fontFamily: 'Inter_500Medium',
+            fontSize: 13,
+            color: Colors.brand.navyMuted,
+          }}
+        >
+          {t('loginOtp.noAccount')}{' '}
+          <Text style={{ color: Colors.brand.orange, fontFamily: 'Inter_700Bold' }}>
+            {t('loginOtp.createAccount')}
+          </Text>
+        </Text>
+      </Pressable>
+
+      <Text
+        style={{
+          fontFamily: 'Inter_400Regular',
+          fontSize: 11,
+          color: Colors.brand.navyMuted,
+          textAlign: 'center',
+          marginTop: 14,
+          opacity: 0.6,
+        }}
+      >
+        v{APP_VERSION}
+      </Text>
+    </View>
+  );
+
+  return (
+    <StepContainer variant="light" footer={footer}>
+      <SerifHeading
+        leading={t('loginOtp.phoneTitleLeading')}
+        italic={t('loginOtp.phoneTitleItalic')}
+        trailing="."
+        variant="light"
+      />
+
+      <Text
+        style={{
+          fontFamily: 'Inter_400Regular',
+          fontSize: 15,
+          color: Colors.brand.navyMuted,
+          lineHeight: 22,
+          marginTop: 14,
+        }}
+      >
+        {t('loginOtp.phoneSubtitle')}
+      </Text>
+
+      <View style={{ marginTop: 32 }}>
+        <Text
+          style={{
+            fontFamily: 'Inter_600SemiBold',
+            fontSize: 11,
+            letterSpacing: 1.6,
+            color: Colors.brand.navyMuted,
+            marginBottom: 10,
+          }}
+        >
+          {t('loginOtp.phoneLabel')}
+        </Text>
+        <PhoneInput
+          value={phone}
+          onChange={onPhoneChange}
+          placeholder={t('loginOtp.phonePlaceholderPretty')}
+          isDisabled={loading}
+        />
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 }}>
+          {canSendCode ? (
+            <Animated.View
+              entering={FadeIn.duration(200)}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
             >
-              <ArrowLeft size={18} color="#71717A" />
-              <Text className="text-sm text-[#71717A]">{t('loginOtp.changePhone')}</Text>
-            </Pressable>
-          )}
-
-          {/* Header */}
-          <View className="mb-7">
-            <Text className="text-2xl font-bold text-[#11181C] dark:text-[#ECEDEE]">
-              {t('loginOtp.title')}
-            </Text>
-            <Text className="text-sm text-[#71717A] mt-1">
-              {step === 'code'
-                ? t('loginOtp.codeSent', { phone: maskedPhone })
-                : t('loginOtp.subtitle')
-              }
-            </Text>
-          </View>
-
-          {/* Error */}
-          {!!error && (
-            <View className="bg-[#FEEBE7] border border-[#F9C0B5] rounded-2xl px-4 py-3 mb-5">
-              <Text className="text-sm text-[#EC1F00] font-medium">{error}</Text>
+              <CheckCircle2 size={14} color={Colors.success} strokeWidth={2.2} />
+              <Text
+                style={{
+                  fontFamily: 'Inter_500Medium',
+                  fontSize: 13,
+                  color: Colors.success,
+                }}
+              >
+                {t('loginOtp.phoneValid')}
+              </Text>
+            </Animated.View>
+          ) : (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Info size={14} color={Colors.brand.navyMuted} strokeWidth={2} />
+              <Text
+                style={{
+                  fontFamily: 'Inter_400Regular',
+                  fontSize: 13,
+                  color: Colors.brand.navyMuted,
+                }}
+              >
+                {t('loginOtp.phoneHelper')}
+              </Text>
             </View>
           )}
-
-          {step === 'phone' ? (
-            /* ── STEP 1: Phone input ── */
-            <>
-              <Text className="text-sm font-medium text-[#11181C] dark:text-[#ECEDEE] mb-2">
-                {t('loginOtp.phone')}
-              </Text>
-              <View className="mb-6">
-                <PhoneInput
-                  value={phone}
-                  onChange={setPhone}
-                  placeholder={t('loginOtp.phonePlaceholder')}
-                  isDisabled={isLoading}
-                />
-              </View>
-
-              <Pressable
-                onPress={handleSendCode}
-                disabled={isLoading || !canSendCode}
-                className="rounded-2xl py-4 items-center active:opacity-80"
-                style={{ backgroundColor: !canSendCode ? '#B3B7C3' : Colors.primary }}
-              >
-                {isLoading
-                  ? <ActivityIndicator color="white" />
-                  : <Text className="text-white font-semibold text-base">{t('loginOtp.sendCode')}</Text>
-                }
-              </Pressable>
-            </>
-          ) : (
-            /* ── STEP 2: OTP code ── */
-            <>
-              <Text className="text-sm font-medium text-[#11181C] dark:text-[#ECEDEE] mb-2">
-                {t('loginOtp.enterCode')}
-              </Text>
-              <View className="border border-[#E4E4E7] dark:border-[#272831] rounded-2xl px-4 bg-white dark:bg-[#18191F] mb-6 items-center justify-center" style={{ height: 72 }}>
-                <TextInput
-                  ref={codeInputRef}
-                  className="text-3xl font-bold text-[#11181C] dark:text-[#ECEDEE] tracking-[16px] w-full text-center"
-                  style={{ height: 72, textAlignVertical: 'center' }}
-                  placeholder="· · · · · ·"
-                  placeholderTextColor="#D4D4D8"
-                  value={code}
-                  onChangeText={(v) => setCode(v.replace(/\D/g, '').slice(0, 6))}
-                  keyboardType="number-pad"
-                  maxLength={6}
-                  returnKeyType="done"
-                  onSubmitEditing={handleVerify}
-                />
-              </View>
-
-              <Pressable
-                onPress={handleVerify}
-                disabled={isLoading || code.length < 6}
-                className="rounded-2xl py-4 items-center mb-4 active:opacity-80"
-                style={{ backgroundColor: code.length < 6 ? '#B3B7C3' : Colors.primary }}
-              >
-                {isLoading
-                  ? <ActivityIndicator color="white" />
-                  : <Text className="text-white font-semibold text-base">{t('loginOtp.verify')}</Text>
-                }
-              </Pressable>
-
-              {/* Resend */}
-              <Pressable
-                onPress={cooldown <= 0 && !isLoading ? handleSendCode : undefined}
-                className="items-center active:opacity-70"
-                disabled={isLoading || cooldown > 0}
-              >
-                <Text className="text-sm" style={{ color: cooldown > 0 ? '#71717A' : Colors.primary }}>
-                  {cooldown > 0
-                    ? t('loginOtp.resendIn', { seconds: cooldown })
-                    : t('loginOtp.resend')
-                  }
-                </Text>
-              </Pressable>
-            </>
-          )}
-
-          {/* Secondary: email login */}
-          {step === 'phone' && (
-            <>
-              <View className="flex-row items-center gap-3 w-full mt-6 mb-4">
-                <View className="flex-1 h-px bg-[#E4E4E7] dark:bg-[#272831]" />
-                <Text className="text-xs text-[#71717A]">o</Text>
-                <View className="flex-1 h-px bg-[#E4E4E7] dark:bg-[#272831]" />
-              </View>
-              <Pressable
-                onPress={() => router.push('/(auth)/login')}
-                className="w-full border border-[#E4E4E7] dark:border-[#272831] rounded-2xl py-4 items-center active:opacity-70"
-              >
-                <Text className="text-sm font-medium text-[#31374A] dark:text-[#9BA1B0]">
-                  {t('loginOtp.signInWithEmail')}
-                </Text>
-              </Pressable>
-            </>
-          )}
-
-          {/* Version */}
-          <Text className="text-xs text-[#A1A1AA] text-center mt-8">
-            v{APP_VERSION}
-          </Text>
         </View>
-    </KeyboardAwareScrollView>
+      </View>
+    </StepContainer>
   );
+}
+
+// ─── Code step ─────────────────────────────────────────────────────────────────
+interface CodeStepProps {
+  phone: string;
+  code: string;
+  onCodeChange: (v: string) => void;
+  onVerify: () => void;
+  onResend: () => void;
+  onBack: () => void;
+  loading: boolean;
+  canVerify: boolean;
+  cooldown: number;
+  hasError: boolean;
+  resetKey: number;
+}
+
+function CodeStep({
+  phone,
+  code,
+  onCodeChange,
+  onVerify,
+  onResend,
+  onBack,
+  loading,
+  canVerify,
+  cooldown,
+  hasError,
+  resetKey,
+}: CodeStepProps) {
+  const { t } = useTranslation('auth');
+
+  const footer = (
+    <PrimaryCta
+      label={t('loginOtp.verify')}
+      onPress={onVerify}
+      disabled={!canVerify}
+      loading={loading}
+    />
+  );
+
+  return (
+    <StepContainer
+      variant="dark"
+      showBack
+      onBack={onBack}
+      footer={footer}
+    >
+      <SerifHeading
+        leading={t('loginOtp.codeTitleLeading')}
+        italic={t('loginOtp.codeTitleItalic')}
+        trailing="."
+        variant="dark"
+      />
+
+      <Text
+        style={{
+          fontFamily: 'Inter_400Regular',
+          fontSize: 15,
+          color: 'rgba(255,255,255,0.72)',
+          lineHeight: 22,
+          marginTop: 14,
+        }}
+      >
+        {t('loginOtp.codeSubtitlePrefix', { count: CODE_LENGTH })}{' '}
+        <Text style={{ fontFamily: 'Inter_700Bold', color: '#FFFFFF' }}>
+          {formatPhoneForDisplay(phone)}
+        </Text>
+        . {t('loginOtp.codeSubtitleSuffix')}
+      </Text>
+
+      <View style={{ marginTop: 32 }}>
+        <OtpBoxesInput
+          key={resetKey}
+          value={code}
+          onChange={onCodeChange}
+          length={CODE_LENGTH}
+          variant="dark"
+          hasError={hasError}
+        />
+      </View>
+
+      <Pressable
+        onPress={onResend}
+        disabled={cooldown > 0 || loading}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: cooldown > 0 || loading }}
+        style={{ alignSelf: 'center', marginTop: 24, paddingVertical: 8 }}
+        hitSlop={12}
+      >
+        <Text
+          style={{
+            fontFamily: 'Inter_500Medium',
+            fontSize: 13,
+            color: cooldown > 0 ? 'rgba(255,255,255,0.55)' : Colors.brand.orange,
+          }}
+        >
+          {cooldown > 0
+            ? t('loginOtp.codeDidntReceive') +
+              '  ·  ' +
+              t('loginOtp.resendIn', { seconds: cooldown })
+            : t('loginOtp.resend')}
+        </Text>
+      </Pressable>
+    </StepContainer>
+  );
+}
+
+function formatPhoneForDisplay(e164: string): string {
+  if (!e164) return '';
+  const match = e164.match(/^(\+\d{1,3})(\d{3})(\d{3})(\d{4,})$/);
+  if (!match) return e164;
+  return `${match[1]} ${match[2]} ${match[3]} ${match[4]}`;
 }

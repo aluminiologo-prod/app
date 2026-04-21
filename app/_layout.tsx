@@ -16,6 +16,14 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from '@expo-google-fonts/inter';
+import {
+  Fraunces_400Regular,
+  Fraunces_600SemiBold,
+  Fraunces_700Bold,
+  Fraunces_400Regular_Italic,
+  Fraunces_600SemiBold_Italic,
+  Fraunces_700Bold_Italic,
+} from '@expo-google-fonts/fraunces';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider } from '../src/contexts/AuthContext';
 
@@ -57,6 +65,12 @@ export default function RootLayout() {
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
+    Fraunces_400Regular,
+    Fraunces_600SemiBold,
+    Fraunces_700Bold,
+    Fraunces_400Regular_Italic,
+    Fraunces_600SemiBold_Italic,
+    Fraunces_700Bold_Italic,
   });
 
   // ready = fonts loaded successfully OR font loading failed (fall back to system fonts)
@@ -89,8 +103,11 @@ export default function RootLayout() {
           <AuthProvider>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="index" />
+              <Stack.Screen name="onboarding" />
               <Stack.Screen name="(auth)" />
               <Stack.Screen name="(app)" />
+              <Stack.Screen name="(client)" />
+              <Stack.Screen name="flow-choice" options={{ presentation: 'modal' }} />
             </Stack>
             <StatusBar style="auto" />
             <ToastWithInsets />

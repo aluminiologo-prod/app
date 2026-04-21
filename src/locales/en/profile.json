@@ -1,0 +1,177 @@
+{
+  "header": {
+    "title": "My Profile",
+    "back": "Back",
+    "logout": "Log out",
+    "switchFlow": "Switch to admin mode"
+  },
+  "hero": {
+    "memberSince": "Member since {{year}}",
+    "noName": "Add your name"
+  },
+  "completeness": {
+    "headline": "Profile at {{percent}}%",
+    "missingIntro_one": "You're <b>{{count}} field</b> away from completing your profile.",
+    "missingIntro_other": "You're <b>{{count}} fields</b> away from completing your profile.",
+    "missingFields": "You still need {{fields}}.",
+    "done": "Profile complete",
+    "doneSubtitle": "Thanks for keeping your information up to date."
+  },
+  "sectionCounter": "{{filled}}/{{total}} complete",
+  "verified": "Verified",
+  "listConjunction": " and ",
+  "sections": {
+    "personal": "Personal Info",
+    "contact": "Contact",
+    "billing": "Billing & Shipping",
+    "app": "App"
+  },
+  "rows": {
+    "name": "Full name",
+    "personType": "Person type",
+    "clientType": "Client type",
+    "phone": "Phone",
+    "email": "Email",
+    "fiscalDoc": "Fiscal document",
+    "address": "Address",
+    "empty": "Add",
+    "personType": {
+      "INDIVIDUAL": "Individual",
+      "BUSINESS": "Business"
+    }
+  },
+  "missingFieldName": {
+    "name": "name",
+    "personType": "person type",
+    "clientType": "client type",
+    "phone": "phone",
+    "email": "email",
+    "fiscalDoc": "fiscal document",
+    "address": "address"
+  },
+  "grid": {
+    "orders": "My orders",
+    "addresses": "Addresses",
+    "notifications": "Notifications",
+    "help": "Help",
+    "comingSoon": "Coming soon"
+  },
+  "edit": {
+    "eyebrow": "Edit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "name": {
+      "titleLeading": "What's your",
+      "titleItalic": "name",
+      "titleTrailing": "?",
+      "subtitle": "This is how your name will appear on invoices and communications.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "successToast": "Name updated"
+    },
+    "personType": {
+      "titleLeading": "Buying as a",
+      "titleItalic": "person",
+      "titleTrailing": " or business",
+      "subtitle": "Let us know whether you're buying for yourself or on behalf of a business.",
+      "INDIVIDUAL": {
+        "title": "Individual",
+        "description": "A person buying for themselves."
+      },
+      "BUSINESS": {
+        "title": "Business",
+        "description": "A company, workshop, or commercial client."
+      },
+      "successToast": "Person type updated"
+    },
+    "clientType": {
+      "titleLeading": "What do you",
+      "titleItalic": "do",
+      "titleTrailing": "?",
+      "subtitle": "Pick the option that best describes your line of work.",
+      "loading": "Loading options…",
+      "error": "Could not load the list. Please try again.",
+      "successToast": "Client type updated"
+    },
+    "phone": {
+      "titleLeading": "Your new",
+      "titleItalic": "phone",
+      "titleTrailing": "",
+      "subtitle": "We'll send a 6-digit code to verify the new number.",
+      "codeTitleLeading": "Confirm your",
+      "codeTitleItalic": "code",
+      "codeSubtitle": "We sent a code to {{phone}}. Enter it to finish.",
+      "sendCode": "Send code",
+      "codeSentTo": "Code sent to {{phone}}",
+      "codeLabel": "Verification code",
+      "resend": "Resend code",
+      "verify": "Verify",
+      "back": "Change number",
+      "successToast": "Phone updated",
+      "errors": {
+        "sendFailed": "We couldn't send the code. Check the number and try again.",
+        "verifyFailed": "The code didn't match. Try again.",
+        "syncFailed": "Verified, but we couldn't sync the phone. Please retry."
+      }
+    },
+    "email": {
+      "titleLeading": "Your",
+      "titleItalic": "email",
+      "titleTrailing": "",
+      "subtitle": "The email you use to sign in will update too.",
+      "email": "Email",
+      "successToast": "Email updated",
+      "errors": {
+        "inUse": "This email is already linked to another client."
+      }
+    },
+    "fiscalDoc": {
+      "titleLeading": "Your",
+      "titleItalic": "fiscal",
+      "titleTrailing": " document",
+      "subtitle": "Prefix plus 6 to 12 digits, e.g. V-12345678.",
+      "prefix": "Prefix",
+      "number": "Number",
+      "successToast": "Fiscal document updated",
+      "errors": {
+        "invalid": "Format must be V/E/J/G/P followed by 6–12 digits.",
+        "inUse": "This fiscal document is already registered."
+      }
+    },
+    "address": {
+      "titleLeading": "Your shipping",
+      "titleItalic": "address",
+      "titleTrailing": "",
+      "subtitle": "Where should we ship your orders?",
+      "address": "Street address",
+      "addressPlaceholder": "Av. Francisco de Miranda, Edif. Parque Cristal…",
+      "city": "City",
+      "cityPlaceholder": "Caracas",
+      "successToast": "Address updated"
+    }
+  },
+  "flowChoice": {
+    "title": "Where would you like to go?",
+    "subtitle": "Your account has access to both the customer experience and the admin tools.",
+    "client": {
+      "title": "Continue as customer",
+      "subtitle": "Browse the catalog, manage orders and your profile."
+    },
+    "admin": {
+      "title": "Go to admin mode",
+      "subtitle": "In-transit, transfers, and operations for staff."
+    },
+    "remember": "You can switch anytime from your profile."
+  },
+  "logoutConfirm": {
+    "title": "Log out?",
+    "message": "You'll need to sign in again to access your profile.",
+    "cancel": "Cancel",
+    "confirm": "Log out"
+  },
+  "errors": {
+    "loadFailed": "We couldn't load your profile.",
+    "retry": "Try again",
+    "saveFailed": "We couldn't save your changes. Please try again."
+  }
+}

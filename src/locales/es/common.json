@@ -24,7 +24,10 @@
   "tabs": {
     "inTransit": "En Tránsito",
     "transfers": "Transferencias",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "home": "Inicio",
+    "orders": "Pedidos",
+    "catalog": "Catálogo"
   },
   "comingSoon": "Próximamente",
   "version": "Versión"

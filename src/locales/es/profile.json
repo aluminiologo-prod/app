@@ -1,0 +1,177 @@
+{
+  "header": {
+    "title": "Mi Perfil",
+    "back": "Atrás",
+    "logout": "Cerrar sesión",
+    "switchFlow": "Cambiar a modo admin"
+  },
+  "hero": {
+    "memberSince": "Cliente desde {{year}}",
+    "noName": "Agrega tu nombre"
+  },
+  "completeness": {
+    "headline": "Perfil al {{percent}}%",
+    "missingIntro_one": "Te falta <b>{{count}} dato</b> para completar tu perfil.",
+    "missingIntro_other": "Te faltan <b>{{count}} datos</b> para completar tu perfil.",
+    "missingFields": "Necesitas {{fields}}.",
+    "done": "Perfil completo",
+    "doneSubtitle": "Gracias por mantener tu información al día."
+  },
+  "sectionCounter": "{{filled}}/{{total}} completos",
+  "verified": "Verificado",
+  "listConjunction": " y ",
+  "sections": {
+    "personal": "Datos Personales",
+    "contact": "Contacto",
+    "billing": "Facturación y Envío",
+    "app": "Aplicación"
+  },
+  "rows": {
+    "name": "Nombre completo",
+    "personType": "Tipo de persona",
+    "clientType": "Tipo de cliente",
+    "phone": "Teléfono",
+    "email": "Correo",
+    "fiscalDoc": "Cédula / RIF",
+    "address": "Dirección",
+    "empty": "Agregar",
+    "personType": {
+      "INDIVIDUAL": "Persona natural",
+      "BUSINESS": "Empresa"
+    }
+  },
+  "missingFieldName": {
+    "name": "nombre",
+    "personType": "tipo de persona",
+    "clientType": "tipo de cliente",
+    "phone": "teléfono",
+    "email": "correo",
+    "fiscalDoc": "cédula/RIF",
+    "address": "dirección"
+  },
+  "grid": {
+    "orders": "Mis pedidos",
+    "addresses": "Direcciones",
+    "notifications": "Notificaciones",
+    "help": "Ayuda",
+    "comingSoon": "Próximamente"
+  },
+  "edit": {
+    "eyebrow": "Editar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "name": {
+      "titleLeading": "¿Cómo te",
+      "titleItalic": "llamas",
+      "titleTrailing": "?",
+      "subtitle": "Así aparecerá tu nombre en facturas y comunicaciones.",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "successToast": "Nombre actualizado"
+    },
+    "personType": {
+      "titleLeading": "Compras como",
+      "titleItalic": "persona",
+      "titleTrailing": " o empresa",
+      "subtitle": "Indícanos si compras para ti o en nombre de una empresa.",
+      "INDIVIDUAL": {
+        "title": "Persona natural",
+        "description": "Una persona comprando para sí misma."
+      },
+      "BUSINESS": {
+        "title": "Empresa",
+        "description": "Una compañía, taller o cliente comercial."
+      },
+      "successToast": "Tipo de persona actualizado"
+    },
+    "clientType": {
+      "titleLeading": "¿A qué te",
+      "titleItalic": "dedicas",
+      "titleTrailing": "?",
+      "subtitle": "Elige la opción que mejor describe tu actividad.",
+      "loading": "Cargando opciones…",
+      "error": "No pudimos cargar la lista. Inténtalo de nuevo.",
+      "successToast": "Tipo de cliente actualizado"
+    },
+    "phone": {
+      "titleLeading": "Tu nuevo",
+      "titleItalic": "teléfono",
+      "titleTrailing": "",
+      "subtitle": "Te enviaremos un código de 6 dígitos para verificar el nuevo número.",
+      "codeTitleLeading": "Confirma tu",
+      "codeTitleItalic": "código",
+      "codeSubtitle": "Enviamos un código a {{phone}}. Ingrésalo para finalizar.",
+      "sendCode": "Enviar código",
+      "codeSentTo": "Código enviado a {{phone}}",
+      "codeLabel": "Código de verificación",
+      "resend": "Reenviar código",
+      "verify": "Verificar",
+      "back": "Cambiar número",
+      "successToast": "Teléfono actualizado",
+      "errors": {
+        "sendFailed": "No pudimos enviar el código. Revisa el número e inténtalo de nuevo.",
+        "verifyFailed": "El código no coincide. Inténtalo de nuevo.",
+        "syncFailed": "Se verificó, pero no pudimos sincronizar el teléfono. Reintenta."
+      }
+    },
+    "email": {
+      "titleLeading": "Tu",
+      "titleItalic": "correo",
+      "titleTrailing": "",
+      "subtitle": "También actualizaremos el correo con el que inicias sesión.",
+      "email": "Correo",
+      "successToast": "Correo actualizado",
+      "errors": {
+        "inUse": "Este correo ya está vinculado a otro cliente."
+      }
+    },
+    "fiscalDoc": {
+      "titleLeading": "Tu",
+      "titleItalic": "documento",
+      "titleTrailing": " fiscal",
+      "subtitle": "Prefijo más 6 a 12 dígitos, ej. V-12345678.",
+      "prefix": "Prefijo",
+      "number": "Número",
+      "successToast": "Documento actualizado",
+      "errors": {
+        "invalid": "El formato debe ser V/E/J/G/P seguido de 6 a 12 dígitos.",
+        "inUse": "Este documento ya está registrado."
+      }
+    },
+    "address": {
+      "titleLeading": "Tu",
+      "titleItalic": "dirección",
+      "titleTrailing": " de envío",
+      "subtitle": "¿A dónde enviaremos tus pedidos?",
+      "address": "Dirección",
+      "addressPlaceholder": "Av. Francisco de Miranda, Edif. Parque Cristal…",
+      "city": "Ciudad",
+      "cityPlaceholder": "Caracas",
+      "successToast": "Dirección actualizada"
+    }
+  },
+  "flowChoice": {
+    "title": "¿A dónde quieres ir?",
+    "subtitle": "Tu cuenta tiene acceso a la experiencia del cliente y al panel administrativo.",
+    "client": {
+      "title": "Continuar como cliente",
+      "subtitle": "Navega el catálogo, gestiona pedidos y tu perfil."
+    },
+    "admin": {
+      "title": "Ir al modo admin",
+      "subtitle": "En tránsito, transferencias y operaciones del staff."
+    },
+    "remember": "Puedes cambiar en cualquier momento desde tu perfil."
+  },
+  "logoutConfirm": {
+    "title": "¿Cerrar sesión?",
+    "message": "Necesitarás iniciar sesión de nuevo para acceder a tu perfil.",
+    "cancel": "Cancelar",
+    "confirm": "Cerrar sesión"
+  },
+  "errors": {
+    "loadFailed": "No pudimos cargar tu perfil.",
+    "retry": "Reintentar",
+    "saveFailed": "No pudimos guardar los cambios. Inténtalo de nuevo."
+  }
+}

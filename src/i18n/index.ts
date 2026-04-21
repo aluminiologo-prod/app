@@ -5,10 +5,14 @@ import { getLocales } from 'expo-localization';
 import enCommon from '../locales/en/common.json';
 import enAuth from '../locales/en/auth.json';
 import enTransfers from '../locales/en/transfers.json';
+import enOnboarding from '../locales/en/onboarding.json';
+import enProfile from '../locales/en/profile.json';
 
 import esCommon from '../locales/es/common.json';
 import esAuth from '../locales/es/auth.json';
 import esTransfers from '../locales/es/transfers.json';
+import esOnboarding from '../locales/es/onboarding.json';
+import esProfile from '../locales/es/profile.json';
 
 const deviceLanguage = getLocales()[0]?.languageCode ?? 'en';
 const lng = ['es', 'en'].includes(deviceLanguage) ? deviceLanguage : 'en';
@@ -21,11 +25,15 @@ i18n.use(initReactI18next).init({
       common: enCommon,
       auth: enAuth,
       transfers: enTransfers,
+      onboarding: enOnboarding,
+      profile: enProfile,
     },
     es: {
       common: esCommon,
       auth: esAuth,
       transfers: esTransfers,
+      onboarding: esOnboarding,
+      profile: esProfile,
     },
   },
   interpolation: { escapeValue: false },

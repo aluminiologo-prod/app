@@ -71,6 +71,33 @@ jest.mock('expo-router', () => ({
 }));
 
 // ---------------------------------------------------------------------------
+// @react-native-async-storage/async-storage — in-memory implementation
+// ---------------------------------------------------------------------------
+jest.mock('@react-native-async-storage/async-storage', () => {
+  const store = new Map<string, string>();
+  return {
+    __esModule: true,
+    default: {
+      getItem: jest.fn((key: string) =>
+        Promise.resolve(store.get(key) ?? null),
+      ),
+      setItem: jest.fn((key: string, value: string) => {
+        store.set(key, value);
+        return Promise.resolve();
+      }),
+      removeItem: jest.fn((key: string) => {
+        store.delete(key);
+        return Promise.resolve();
+      }),
+      clear: jest.fn(() => {
+        store.clear();
+        return Promise.resolve();
+      }),
+    },
+  };
+});
+
+// ---------------------------------------------------------------------------
 // expo-secure-store — in-memory implementation so nothing touches the keychain
 // ---------------------------------------------------------------------------
 // NOTE: the Map must be declared INSIDE the factory (jest.mock hoisting rule).
@@ -292,6 +319,11 @@ jest.mock('react-native-svg', () => {
     G: stub,
     Circle: stub,
     Rect: stub,
+    Defs: stub,
+    Pattern: stub,
+    LinearGradient: stub,
+    Stop: stub,
+    ClipPath: stub,
   };
 });
 
