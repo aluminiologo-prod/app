@@ -213,7 +213,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await setFlowChoice(flow);
     setFlowChoiceState(flow);
     if (flow === 'client') {
-      router.replace('/(client)/(tabs)/profile');
+      router.replace('/(client)/(tabs)/home');
     } else {
       router.replace('/(app)/(tabs)/in-transit');
     }

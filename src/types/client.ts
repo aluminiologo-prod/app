@@ -23,6 +23,7 @@ export interface Client {
   source: ClientSource;
   is_active: boolean;
   is_archived: boolean;
+  onboarding: boolean;
   notes: string | null;
   created_at: string;
   updated_at: string;
