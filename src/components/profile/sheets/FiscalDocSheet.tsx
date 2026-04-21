@@ -67,25 +67,29 @@ export function FiscalDocSheet({ isOpen, initialRif, onClose }: Props) {
     }
   };
 
+  const labelColor = isDark ? '#9BA1B0' : Colors.brand.navyMuted;
+
   return (
     <EditSheetFrame
       isOpen={isOpen}
       onClose={onClose}
-      title={t('edit.fiscalDoc.title')}
+      eyebrow={t('edit.eyebrow')}
+      titleLeading={t('edit.fiscalDoc.titleLeading')}
+      titleItalic={t('edit.fiscalDoc.titleItalic')}
+      titleTrailing={t('edit.fiscalDoc.titleTrailing')}
       subtitle={t('edit.fiscalDoc.subtitle')}
-      primaryLabel={t('edit.fiscalDoc.save')}
+      primaryLabel={t('edit.save')}
       onPrimary={handleSave}
       primaryDisabled={!canSave}
       primaryLoading={isPending}
-      snapPoints={['62%', '92%']}
     >
       <Text
         style={{
-          fontFamily: 'Inter_600SemiBold',
-          fontSize: 12,
-          letterSpacing: 0.6,
+          fontFamily: 'Inter_700Bold',
+          fontSize: 11,
+          letterSpacing: 1.2,
           textTransform: 'uppercase',
-          color: isDark ? '#C7CBD4' : Colors.brand.navyMuted,
+          color: labelColor,
           marginBottom: 8,
         }}
       >
@@ -105,8 +109,8 @@ export function FiscalDocSheet({ isOpen, initialRif, onClose }: Props) {
                 height: 46,
                 borderRadius: 12,
                 borderWidth: 1.5,
-                borderColor: active ? Colors.brand.orange : Colors.brand.creamSoft,
-                backgroundColor: active ? Colors.brand.orange : 'transparent',
+                borderColor: active ? Colors.brand.orange : '#E2DAC9',
+                backgroundColor: active ? Colors.brand.orange : '#FFFFFF',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}

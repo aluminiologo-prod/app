@@ -40,15 +40,17 @@ export function PersonTypeSheet({ isOpen, initialPersonType, onClose }: Props) {
     <EditSheetFrame
       isOpen={isOpen}
       onClose={onClose}
-      title={t('edit.personType.title')}
+      eyebrow={t('edit.eyebrow')}
+      titleLeading={t('edit.personType.titleLeading')}
+      titleItalic={t('edit.personType.titleItalic')}
+      titleTrailing={t('edit.personType.titleTrailing')}
       subtitle={t('edit.personType.subtitle')}
-      primaryLabel={t('edit.personType.save')}
+      primaryLabel={t('edit.save')}
       onPrimary={handleSave}
       primaryDisabled={!canSave}
       primaryLoading={isPending}
-      snapPoints={['60%', '90%']}
     >
-      <View style={{ flexDirection: 'row', gap: 12 }}>
+      <View style={{ flexDirection: 'row', gap: 12, marginBottom: 4 }}>
         <SelectableCard
           icon={User}
           title={t('edit.personType.INDIVIDUAL.title')}

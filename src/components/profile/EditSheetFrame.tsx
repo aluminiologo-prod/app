@@ -1,60 +1,96 @@
 import { useEffect, useMemo, useRef, type ReactNode } from 'react';
-import { Pressable, Text, View, useColorScheme, ActivityIndicator } from 'react-native';
-import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import {
+  Pressable,
+  Text,
+  View,
+  useColorScheme,
+  ActivityIndicator,
+} from 'react-native';
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { X } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
+import { SerifHeading } from '../register/SerifHeading';
 import { Colors } from '../../theme/colors';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  /** Small orange eyebrow above the heading (e.g. "EDITAR"). */
+  eyebrow: string;
+  /** The three parts of the serif heading ("¿Cómo te" + italic "llamas" + "?"). */
+  titleLeading: string;
+  titleItalic: string;
+  titleTrailing?: string;
   subtitle?: string;
-  /** Primary CTA label (e.g. "Save"). Hidden when undefined. */
+  /** Primary CTA label (e.g. "Guardar"). Hidden when undefined. */
   primaryLabel?: string;
   onPrimary?: () => void;
   primaryDisabled?: boolean;
   primaryLoading?: boolean;
-  /** Optional snap points override; defaults to ['62%','92%']. */
+  /** Secondary / cancel label; falls back to i18n "cancel". */
+  cancelLabel?: string;
+  /** Optional snap points override; when omitted the sheet auto-sizes to content. */
   snapPoints?: (string | number)[];
+  /** When true, renders children inside a ScrollView (for long forms). */
+  scrollable?: boolean;
   children: ReactNode;
 }
 
 /**
- * Shared chrome for every profile edit bottom sheet. Owns the BottomSheet
- * instance, the backdrop, the title row with the close button, and the
- * sticky footer with the primary CTA. Children render inside a scroll view
- * so long forms remain usable on small screens.
+ * Shared chrome for every profile edit sheet. Matches the onboarding design:
+ *   - Cream background
+ *   - "EDITAR" orange eyebrow + small dash
+ *   - Big serif heading with an italic accent (e.g. "¿Cómo te *llamas*?")
+ *   - Sub-line in muted navy
+ *   - Dual-button footer: outlined "Cancelar" + filled orange primary
+ *
+ * The sheet auto-sizes to its content by default (via CONTENT_HEIGHT) so
+ * short forms don't take up the whole screen.
  */
 export function EditSheetFrame({
   isOpen,
   onClose,
-  title,
+  eyebrow,
+  titleLeading,
+  titleItalic,
+  titleTrailing,
   subtitle,
   primaryLabel,
   onPrimary,
   primaryDisabled,
   primaryLoading,
+  cancelLabel,
   snapPoints,
+  scrollable = false,
   children,
 }: Props) {
+  const { t: tCommon } = useTranslation('common');
   const sheetRef = useRef<BottomSheet>(null);
   const insets = useSafeAreaInsets();
   const isDark = useColorScheme() === 'dark';
 
-  const points = useMemo(() => snapPoints ?? ['62%', '92%'], [snapPoints]);
+  // Default: auto-size to content via `enableDynamicSizing`. Callers that
+  // embed scroll content (long lists of selectable cards, e.g. ClientType
+  // picker) can override with fixed snap points.
+  const dynamic = !snapPoints;
+  const points = useMemo(() => snapPoints, [snapPoints]);
 
   useEffect(() => {
     if (isOpen) sheetRef.current?.expand();
     else sheetRef.current?.close();
   }, [isOpen]);
 
-  const bg = isDark ? '#18191F' : '#FFFFFF';
-  const handleColor = isDark ? '#3A3B44' : '#D4D4D8';
-  const titleColor = isDark ? '#ECEDEE' : Colors.brand.navy;
+  const bg = isDark ? '#18191F' : Colors.brand.cream;
+  const handleColor = isDark ? '#3A3B44' : '#D4CFC0';
   const bodyColor = isDark ? '#9BA1B0' : Colors.brand.navyMuted;
-  const borderColor = isDark ? '#272831' : Colors.brand.creamSoft;
+  const cancelBg = isDark ? '#20222A' : '#FFFFFF';
+  const cancelBorder = isDark ? '#30313A' : '#E2DAC9';
+  const cancelText = isDark ? '#ECEDEE' : Colors.brand.navy;
 
   const renderBackdrop = (props: BottomSheetBackdropProps) => (
     <BottomSheetBackdrop
@@ -66,11 +102,14 @@ export function EditSheetFrame({
     />
   );
 
+  const Body = scrollable ? BottomSheetScrollView : BottomSheetView;
+
   return (
     <BottomSheet
       ref={sheetRef}
       index={-1}
       snapPoints={points}
+      enableDynamicSizing={dynamic}
       enablePanDownToClose
       backgroundStyle={{ backgroundColor: bg }}
       handleIndicatorStyle={{ backgroundColor: handleColor }}
@@ -79,122 +118,159 @@ export function EditSheetFrame({
       keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
     >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 20,
-          paddingTop: 4,
-          paddingBottom: 12,
-          borderBottomWidth: 1,
-          borderBottomColor: borderColor,
-        }}
+      <Body
+        contentContainerStyle={
+          scrollable
+            ? { paddingHorizontal: 24, paddingTop: 18, paddingBottom: 12 }
+            : undefined
+        }
+        style={
+          scrollable ? undefined : { paddingHorizontal: 24, paddingTop: 18 }
+        }
+        keyboardShouldPersistTaps={scrollable ? 'handled' : undefined}
       >
-        <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              fontFamily: 'Fraunces_700Bold',
-              fontSize: 20,
-              color: titleColor,
-            }}
-          >
-            {title}
-          </Text>
-          {subtitle ? (
-            <Text
-              style={{
-                fontFamily: 'Inter_400Regular',
-                fontSize: 13,
-                lineHeight: 18,
-                color: bodyColor,
-                marginTop: 4,
-              }}
-            >
-              {subtitle}
-            </Text>
-          ) : null}
-        </View>
-        <Pressable
-          onPress={onClose}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel="Close"
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 18,
-            backgroundColor: isDark ? '#20222A' : Colors.brand.creamSoft,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <X size={18} color={bodyColor} />
-        </Pressable>
-      </View>
-
-      <BottomSheetScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 24 }}
-        keyboardShouldPersistTaps="handled"
-      >
-        {children}
-      </BottomSheetScrollView>
-
-      {primaryLabel && onPrimary ? (
+        {/* Eyebrow row: small orange dash + "EDITAR" */}
         <View
           style={{
-            paddingHorizontal: 20,
-            paddingTop: 12,
-            paddingBottom: Math.max(insets.bottom, 16),
-            borderTopWidth: 1,
-            borderTopColor: borderColor,
-            backgroundColor: bg,
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 10,
           }}
         >
-          <Pressable
-            onPress={primaryLoading ? undefined : onPrimary}
-            disabled={primaryDisabled || primaryLoading}
-            accessibilityRole="button"
-            accessibilityLabel={primaryLabel}
-            style={({ pressed }) => ({
-              height: 52,
-              borderRadius: 14,
-              backgroundColor: primaryDisabled
-                ? isDark
-                  ? '#2C2D36'
-                  : '#E4E4E7'
-                : Colors.brand.orange,
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'row',
-              opacity: pressed ? 0.85 : 1,
-              shadowColor: Colors.brand.orange,
-              shadowOpacity: primaryDisabled ? 0 : 0.25,
-              shadowRadius: 12,
-              shadowOffset: { width: 0, height: 6 },
-              elevation: primaryDisabled ? 0 : 4,
-            })}
+          <View
+            style={{
+              width: 22,
+              height: 2,
+              borderRadius: 1,
+              backgroundColor: Colors.brand.orange,
+              marginRight: 8,
+            }}
+          />
+          <Text
+            style={{
+              fontFamily: 'Inter_700Bold',
+              fontSize: 11,
+              letterSpacing: 1.4,
+              textTransform: 'uppercase',
+              color: Colors.brand.orange,
+            }}
           >
-            {primaryLoading ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
+            {eyebrow}
+          </Text>
+        </View>
+
+        <SerifHeading
+          leading={titleLeading}
+          italic={titleItalic}
+          trailing={titleTrailing}
+          variant={isDark ? 'dark' : 'light'}
+        />
+
+        {subtitle ? (
+          <Text
+            style={{
+              fontFamily: 'Inter_400Regular',
+              fontSize: 13,
+              lineHeight: 19,
+              color: bodyColor,
+              marginTop: 10,
+              marginBottom: 22,
+            }}
+          >
+            {subtitle}
+          </Text>
+        ) : (
+          <View style={{ height: 22 }} />
+        )}
+
+        {children}
+
+        {/* Footer (inline — auto-sizes with the sheet) */}
+        {primaryLabel && onPrimary ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 12,
+              marginTop: 14,
+              paddingBottom: Math.max(insets.bottom, 10),
+            }}
+          >
+            <Pressable
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel={cancelLabel ?? tCommon('cancel')}
+              style={({ pressed }) => ({
+                flex: 1,
+                height: 52,
+                borderRadius: 14,
+                borderWidth: 1.5,
+                borderColor: cancelBorder,
+                backgroundColor: cancelBg,
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: pressed ? 0.7 : 1,
+              })}
+            >
               <Text
                 style={{
                   fontFamily: 'Inter_700Bold',
-                  fontSize: 15,
-                  color: primaryDisabled
-                    ? isDark
-                      ? '#71717A'
-                      : Colors.brand.navyMuted
-                    : '#FFFFFF',
-                  letterSpacing: 0.2,
+                  fontSize: 13,
+                  letterSpacing: 1,
+                  textTransform: 'uppercase',
+                  color: cancelText,
                 }}
               >
-                {primaryLabel}
+                {cancelLabel ?? tCommon('cancel')}
               </Text>
-            )}
-          </Pressable>
-        </View>
-      ) : null}
+            </Pressable>
+            <Pressable
+              onPress={primaryLoading ? undefined : onPrimary}
+              disabled={primaryDisabled || primaryLoading}
+              accessibilityRole="button"
+              accessibilityLabel={primaryLabel}
+              style={({ pressed }) => ({
+                flex: 1.4,
+                height: 52,
+                borderRadius: 14,
+                backgroundColor: primaryDisabled
+                  ? isDark
+                    ? '#2C2D36'
+                    : '#F1E8D7'
+                  : Colors.brand.orange,
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'row',
+                opacity: pressed ? 0.85 : 1,
+                shadowColor: Colors.brand.orange,
+                shadowOpacity: primaryDisabled ? 0 : 0.25,
+                shadowRadius: 12,
+                shadowOffset: { width: 0, height: 6 },
+                elevation: primaryDisabled ? 0 : 4,
+              })}
+            >
+              {primaryLoading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text
+                  style={{
+                    fontFamily: 'Inter_700Bold',
+                    fontSize: 13,
+                    letterSpacing: 1,
+                    textTransform: 'uppercase',
+                    color: primaryDisabled
+                      ? isDark
+                        ? '#71717A'
+                        : '#C6B9A0'
+                      : '#FFFFFF',
+                  }}
+                >
+                  {primaryLabel}
+                </Text>
+              )}
+            </Pressable>
+          </View>
+        ) : null}
+      </Body>
     </BottomSheet>
   );
 }

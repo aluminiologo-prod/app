@@ -12,7 +12,12 @@ interface Props {
   onClose: () => void;
 }
 
-export function NameSheet({ isOpen, initialFirstName, initialLastName, onClose }: Props) {
+export function NameSheet({
+  isOpen,
+  initialFirstName,
+  initialLastName,
+  onClose,
+}: Props) {
   const { t } = useTranslation('profile');
   const [firstName, setFirstName] = useState(initialFirstName);
   const [lastName, setLastName] = useState(initialLastName);
@@ -34,7 +39,10 @@ export function NameSheet({ isOpen, initialFirstName, initialLastName, onClose }
 
   const handleSave = async () => {
     try {
-      await mutateAsync({ first_name: firstName.trim(), last_name: lastName.trim() });
+      await mutateAsync({
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+      });
       toastSuccess(t('edit.name.successToast'));
       onClose();
     } catch (err) {
@@ -46,8 +54,12 @@ export function NameSheet({ isOpen, initialFirstName, initialLastName, onClose }
     <EditSheetFrame
       isOpen={isOpen}
       onClose={onClose}
-      title={t('edit.name.title')}
-      primaryLabel={t('edit.name.save')}
+      eyebrow={t('edit.eyebrow')}
+      titleLeading={t('edit.name.titleLeading')}
+      titleItalic={t('edit.name.titleItalic')}
+      titleTrailing={t('edit.name.titleTrailing')}
+      subtitle={t('edit.name.subtitle')}
+      primaryLabel={t('edit.save')}
       onPrimary={handleSave}
       primaryDisabled={!canSave}
       primaryLoading={isPending}

@@ -36,7 +36,8 @@ export function AddressSheet({
     trimmedAddress.length >= 10 &&
     trimmedAddress.length <= 500 &&
     trimmedCity.length <= 80 &&
-    (trimmedAddress !== (initialAddress ?? '') || trimmedCity !== (initialCity ?? ''));
+    (trimmedAddress !== (initialAddress ?? '') ||
+      trimmedCity !== (initialCity ?? ''));
 
   const handleSave = async () => {
     try {
@@ -55,13 +56,15 @@ export function AddressSheet({
     <EditSheetFrame
       isOpen={isOpen}
       onClose={onClose}
-      title={t('edit.address.title')}
+      eyebrow={t('edit.eyebrow')}
+      titleLeading={t('edit.address.titleLeading')}
+      titleItalic={t('edit.address.titleItalic')}
+      titleTrailing={t('edit.address.titleTrailing')}
       subtitle={t('edit.address.subtitle')}
-      primaryLabel={t('edit.address.save')}
+      primaryLabel={t('edit.save')}
       onPrimary={handleSave}
       primaryDisabled={!canSave}
       primaryLoading={isPending}
-      snapPoints={['70%', '95%']}
     >
       <LabeledInput
         insideSheet

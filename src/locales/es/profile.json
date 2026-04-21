@@ -55,40 +55,52 @@
     "comingSoon": "Próximamente"
   },
   "edit": {
+    "eyebrow": "Editar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
     "name": {
-      "title": "Editar nombre",
+      "titleLeading": "¿Cómo te",
+      "titleItalic": "llamas",
+      "titleTrailing": "?",
+      "subtitle": "Así aparecerá tu nombre en facturas y comunicaciones.",
       "firstName": "Nombre",
       "lastName": "Apellido",
-      "save": "Guardar",
-      "cancel": "Cancelar",
       "successToast": "Nombre actualizado"
     },
     "personType": {
-      "title": "Tipo de persona",
-      "subtitle": "Indícanos si compras como persona natural o en nombre de una empresa.",
+      "titleLeading": "Compras como",
+      "titleItalic": "persona",
+      "titleTrailing": " o empresa",
+      "subtitle": "Indícanos si compras para ti o en nombre de una empresa.",
       "INDIVIDUAL.title": "Persona natural",
       "INDIVIDUAL.description": "Una persona comprando para sí misma.",
       "BUSINESS.title": "Empresa",
       "BUSINESS.description": "Una compañía, taller o cliente comercial.",
-      "save": "Guardar",
       "successToast": "Tipo de persona actualizado"
     },
     "clientType": {
-      "title": "Tipo de cliente",
+      "titleLeading": "¿A qué te",
+      "titleItalic": "dedicas",
+      "titleTrailing": "?",
       "subtitle": "Elige la opción que mejor describe tu actividad.",
       "loading": "Cargando opciones…",
       "error": "No pudimos cargar la lista. Inténtalo de nuevo.",
-      "save": "Guardar",
       "successToast": "Tipo de cliente actualizado"
     },
     "phone": {
-      "title": "Cambiar teléfono",
+      "titleLeading": "Tu nuevo",
+      "titleItalic": "teléfono",
+      "titleTrailing": "",
       "subtitle": "Te enviaremos un código de 6 dígitos para verificar el nuevo número.",
+      "codeTitleLeading": "Confirma tu",
+      "codeTitleItalic": "código",
+      "codeSubtitle": "Enviamos un código a {{phone}}. Ingrésalo para finalizar.",
       "sendCode": "Enviar código",
       "codeSentTo": "Código enviado a {{phone}}",
       "codeLabel": "Código de verificación",
       "resend": "Reenviar código",
-      "verify": "Verificar y guardar",
+      "verify": "Verificar",
+      "back": "Cambiar número",
       "successToast": "Teléfono actualizado",
       "errors": {
         "sendFailed": "No pudimos enviar el código. Revisa el número e inténtalo de nuevo.",
@@ -97,21 +109,23 @@
       }
     },
     "email": {
-      "title": "Cambiar correo",
+      "titleLeading": "Tu",
+      "titleItalic": "correo",
+      "titleTrailing": "",
       "subtitle": "También actualizaremos el correo con el que inicias sesión.",
       "email": "Correo",
-      "save": "Guardar",
       "successToast": "Correo actualizado",
       "errors": {
         "inUse": "Este correo ya está vinculado a otro cliente."
       }
     },
     "fiscalDoc": {
-      "title": "Cédula / RIF",
+      "titleLeading": "Tu",
+      "titleItalic": "documento",
+      "titleTrailing": " fiscal",
       "subtitle": "Prefijo más 6 a 12 dígitos, ej. V-12345678.",
       "prefix": "Prefijo",
       "number": "Número",
-      "save": "Guardar",
       "successToast": "Documento actualizado",
       "errors": {
         "invalid": "El formato debe ser V/E/J/G/P seguido de 6 a 12 dígitos.",
@@ -119,13 +133,14 @@
       }
     },
     "address": {
-      "title": "Dirección de envío",
+      "titleLeading": "Tu",
+      "titleItalic": "dirección",
+      "titleTrailing": " de envío",
       "subtitle": "¿A dónde enviaremos tus pedidos?",
       "address": "Dirección",
       "addressPlaceholder": "Av. Francisco de Miranda, Edif. Parque Cristal…",
       "city": "Ciudad",
       "cityPlaceholder": "Caracas",
-      "save": "Guardar",
       "successToast": "Dirección actualizada"
     }
   },

@@ -11,51 +11,51 @@ interface Props extends Omit<TextInputProps, 'style'> {
 }
 
 /**
- * Stacked label + input, matches the visual rhythm of the register wizard.
- * When used inside a bottom sheet, pass `insideSheet` so the keyboard avoids
- * the sheet correctly (@gorhom's proxy input is required for that).
+ * Stacked label + input, tuned for the cream-background edit sheets.
+ * When used inside a bottom sheet, pass `insideSheet` so @gorhom's input
+ * proxy keeps the keyboard-avoidance + interactive gestures working.
  */
 export const LabeledInput = forwardRef<TextInput, Props>(function LabeledInput(
   { label, error, insideSheet, ...inputProps },
   ref,
 ) {
   const isDark = useColorScheme() === 'dark';
-  const labelColor = isDark ? '#C7CBD4' : Colors.brand.navyMuted;
+  const labelColor = isDark ? '#9BA1B0' : Colors.brand.navyMuted;
   const textColor = isDark ? '#ECEDEE' : Colors.brand.navy;
   const border = error
     ? Colors.danger
     : isDark
       ? '#30313A'
-      : Colors.brand.creamSoft;
+      : '#E2DAC9';
   const bg = isDark ? '#20222A' : '#FFFFFF';
 
   const Input = insideSheet ? BottomSheetTextInput : TextInput;
 
   return (
-    <View style={{ marginBottom: 14 }}>
+    <View style={{ marginBottom: 16 }}>
       <Text
         style={{
-          fontFamily: 'Inter_600SemiBold',
-          fontSize: 12,
-          letterSpacing: 0.6,
+          fontFamily: 'Inter_700Bold',
+          fontSize: 11,
+          letterSpacing: 1.2,
           textTransform: 'uppercase',
           color: labelColor,
-          marginBottom: 6,
+          marginBottom: 8,
         }}
       >
         {label}
       </Text>
       <Input
         ref={ref as never}
-        placeholderTextColor={isDark ? '#71717A' : '#A1A1AA'}
+        placeholderTextColor={isDark ? '#71717A' : '#A89F8E'}
         {...inputProps}
         style={{
           fontFamily: 'Inter_500Medium',
           fontSize: 15,
           color: textColor,
           backgroundColor: bg,
-          paddingHorizontal: 14,
-          paddingVertical: 13,
+          paddingHorizontal: 16,
+          paddingVertical: 14,
           borderRadius: 12,
           borderWidth: 1,
           borderColor: border,

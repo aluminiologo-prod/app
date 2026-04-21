@@ -44,13 +44,18 @@ export function ClientTypeSheet({ isOpen, initialClientTypeId, onClose }: Props)
     <EditSheetFrame
       isOpen={isOpen}
       onClose={onClose}
-      title={t('edit.clientType.title')}
+      eyebrow={t('edit.eyebrow')}
+      titleLeading={t('edit.clientType.titleLeading')}
+      titleItalic={t('edit.clientType.titleItalic')}
+      titleTrailing={t('edit.clientType.titleTrailing')}
       subtitle={t('edit.clientType.subtitle')}
-      primaryLabel={t('edit.clientType.save')}
+      primaryLabel={t('edit.save')}
       onPrimary={handleSave}
       primaryDisabled={!canSave}
       primaryLoading={isPending}
-      snapPoints={['70%', '92%']}
+      // Long list of cards — give it a fixed tall snap + allow scrolling.
+      snapPoints={['78%', '95%']}
+      scrollable
     >
       {isLoading ? (
         <View style={{ paddingVertical: 32, alignItems: 'center' }}>

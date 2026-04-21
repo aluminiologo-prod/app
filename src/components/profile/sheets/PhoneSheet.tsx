@@ -21,13 +21,6 @@ interface Props {
 
 type Step = 'phone' | 'code';
 
-/**
- * Two-step phone change: the mobile app runs the OTP natively through
- * Supabase (`supabase.auth.updateUser({ phone })` → SMS → `verifyOtp`), and
- * once verified we ask the backend to sync the verified number into
- * `clients.phone`. The backend reads the value from `auth.users` itself, so
- * the user can never forge the new phone.
- */
 export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
   const { t } = useTranslation('profile');
   const isDark = useColorScheme() === 'dark';
@@ -56,9 +49,6 @@ export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
     setError(null);
     setSendingCode(true);
     try {
-      // Supabase's updateUser triggers a phone-change OTP when the phone
-      // differs from the one on the auth user. The session is already active
-      // so no Bearer work needed.
       const { error: err } = await supabase.auth.updateUser({ phone });
       if (err) throw err;
       setStep('code');
@@ -84,8 +74,6 @@ export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
         setCode('');
         return;
       }
-      // Phone is now verified at the auth layer. Ask the backend to pull it
-      // into `clients.phone`.
       try {
         await syncPhone();
       } catch {
@@ -105,20 +93,22 @@ export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
     setError(null);
   };
 
-  const titleColor = isDark ? '#ECEDEE' : Colors.brand.navy;
+  const labelColor = isDark ? '#9BA1B0' : Colors.brand.navyMuted;
 
   if (step === 'phone') {
     return (
       <EditSheetFrame
         isOpen={isOpen}
         onClose={onClose}
-        title={t('edit.phone.title')}
+        eyebrow={t('edit.eyebrow')}
+        titleLeading={t('edit.phone.titleLeading')}
+        titleItalic={t('edit.phone.titleItalic')}
+        titleTrailing={t('edit.phone.titleTrailing')}
         subtitle={t('edit.phone.subtitle')}
         primaryLabel={t('edit.phone.sendCode')}
         onPrimary={handleRequestCode}
         primaryDisabled={!canRequestCode}
         primaryLoading={sendingCode}
-        snapPoints={['70%', '95%']}
       >
         <PhoneInput value={phone} onChange={setPhone} />
         {error ? (
@@ -141,46 +131,24 @@ export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
     <EditSheetFrame
       isOpen={isOpen}
       onClose={onClose}
-      title={t('edit.phone.title')}
-      subtitle={t('edit.phone.codeSentTo', { phone })}
+      eyebrow={t('edit.eyebrow')}
+      titleLeading={t('edit.phone.codeTitleLeading')}
+      titleItalic={t('edit.phone.codeTitleItalic')}
+      subtitle={t('edit.phone.codeSubtitle', { phone })}
       primaryLabel={t('edit.phone.verify')}
       onPrimary={handleVerify}
       primaryDisabled={code.length !== CODE_LENGTH}
       primaryLoading={verifying}
-      snapPoints={['70%', '95%']}
+      cancelLabel={t('edit.phone.back')}
     >
-      <Pressable
-        onPress={onBackToPhone}
-        accessibilityRole="button"
-        hitSlop={10}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginBottom: 18,
-          alignSelf: 'flex-start',
-        }}
-      >
-        <ArrowLeft size={16} color={Colors.brand.orange} />
-        <Text
-          style={{
-            fontFamily: 'Inter_600SemiBold',
-            fontSize: 13,
-            color: Colors.brand.orange,
-            marginLeft: 6,
-          }}
-        >
-          {t('edit.phone.title')}
-        </Text>
-      </Pressable>
-
       <Text
         style={{
-          fontFamily: 'Inter_600SemiBold',
-          fontSize: 12,
-          letterSpacing: 0.6,
+          fontFamily: 'Inter_700Bold',
+          fontSize: 11,
+          letterSpacing: 1.2,
           textTransform: 'uppercase',
-          color: isDark ? '#C7CBD4' : Colors.brand.navyMuted,
-          marginBottom: 10,
+          color: labelColor,
+          marginBottom: 12,
         }}
       >
         {t('edit.phone.codeLabel')}
@@ -207,23 +175,51 @@ export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
         </Text>
       ) : null}
 
-      <Pressable
-        onPress={handleRequestCode}
-        accessibilityRole="button"
-        hitSlop={10}
-        style={{ alignSelf: 'center', marginTop: 18, paddingVertical: 4 }}
-        disabled={sendingCode}
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginTop: 18,
+        }}
       >
-        <Text
-          style={{
-            fontFamily: 'Inter_600SemiBold',
-            fontSize: 13,
-            color: sendingCode ? Colors.brand.navyMuted : titleColor,
-          }}
+        <Pressable
+          onPress={onBackToPhone}
+          accessibilityRole="button"
+          hitSlop={10}
+          style={{ flexDirection: 'row', alignItems: 'center' }}
         >
-          {t('edit.phone.resend')}
-        </Text>
-      </Pressable>
+          <ArrowLeft size={14} color={Colors.brand.navyMuted} />
+          <Text
+            style={{
+              fontFamily: 'Inter_600SemiBold',
+              fontSize: 12,
+              color: Colors.brand.navyMuted,
+              marginLeft: 4,
+            }}
+          >
+            {t('edit.phone.back')}
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={handleRequestCode}
+          accessibilityRole="button"
+          hitSlop={10}
+          disabled={sendingCode}
+        >
+          <Text
+            style={{
+              fontFamily: 'Inter_700Bold',
+              fontSize: 12,
+              letterSpacing: 0.6,
+              textTransform: 'uppercase',
+              color: sendingCode ? Colors.brand.navyMuted : Colors.brand.orange,
+            }}
+          >
+            {t('edit.phone.resend')}
+          </Text>
+        </Pressable>
+      </View>
     </EditSheetFrame>
   );
 }

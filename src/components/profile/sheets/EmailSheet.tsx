@@ -29,7 +29,9 @@ export function EmailSheet({ isOpen, initialEmail, onClose }: Props) {
 
   const trimmed = email.trim().toLowerCase();
   const canSave =
-    EMAIL_REGEX.test(trimmed) && trimmed.length <= 120 && trimmed !== (initialEmail ?? '');
+    EMAIL_REGEX.test(trimmed) &&
+    trimmed.length <= 120 &&
+    trimmed !== (initialEmail ?? '');
 
   const handleSave = async () => {
     setError(null);
@@ -38,8 +40,6 @@ export function EmailSheet({ isOpen, initialEmail, onClose }: Props) {
       toastSuccess(t('edit.email.successToast'));
       onClose();
     } catch (err) {
-      // Backend maps unique-violation to 409 — surface a specific message
-      // inline, everything else goes to the shared toast.
       if (axios.isAxiosError(err) && err.response?.status === 409) {
         setError(t('edit.email.errors.inUse'));
         return;
@@ -52,13 +52,15 @@ export function EmailSheet({ isOpen, initialEmail, onClose }: Props) {
     <EditSheetFrame
       isOpen={isOpen}
       onClose={onClose}
-      title={t('edit.email.title')}
+      eyebrow={t('edit.eyebrow')}
+      titleLeading={t('edit.email.titleLeading')}
+      titleItalic={t('edit.email.titleItalic')}
+      titleTrailing={t('edit.email.titleTrailing')}
       subtitle={t('edit.email.subtitle')}
-      primaryLabel={t('edit.email.save')}
+      primaryLabel={t('edit.save')}
       onPrimary={handleSave}
       primaryDisabled={!canSave}
       primaryLoading={isPending}
-      snapPoints={['58%', '90%']}
     >
       <LabeledInput
         insideSheet
