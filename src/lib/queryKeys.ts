@@ -13,4 +13,7 @@ export const queryKeys = {
   inTransit: createEntityKeys('in-transit'),
   stores: createEntityKeys('stores'),
   countries: createEntityKeys('countries'),
+  clients: createEntityKeys('clients'),
+  clientTypes: createEntityKeys('client-types'),
+  myClient: () => ['clients', 'me'] as const,
 };

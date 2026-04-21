@@ -28,7 +28,7 @@ export default function LoginScreen() {
   const passwordRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    if (isAuthenticated) router.replace('/(app)/(tabs)/in-transit');
+    if (isAuthenticated) router.replace('/');
   }, [isAuthenticated]);
 
   const canSubmit = email.trim().length > 3 && password.length >= 1;
@@ -38,7 +38,7 @@ export default function LoginScreen() {
     try {
       setLoading(true);
       await login(email.trim().toLowerCase(), password);
-      router.replace('/(app)/(tabs)/in-transit');
+      router.replace('/');
     } catch (err) {
       toastApiError(err, t('login.invalidCredentials'));
     } finally {

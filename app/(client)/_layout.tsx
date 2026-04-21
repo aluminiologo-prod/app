@@ -3,7 +3,13 @@ import { useAuth } from '../../src/contexts/AuthContext';
 import { useOnboardingSeen } from '../../src/hooks/useOnboardingSeen';
 import { LoadingScreen } from '../../src/components/ui/LoadingScreen';
 
-export default function AppLayout() {
+/**
+ * Mirror of `app/(app)/_layout.tsx` — this is the shell for CLIENT users.
+ * Protects the whole `(client)` subtree: unauthenticated users bounce to the
+ * registration flow, STAFF-only users get pushed into the admin shell, and
+ * BOTH-users who haven't picked a flow yet see the flow-choice modal.
+ */
+export default function ClientLayout() {
   const { isAuthenticated, isLoading, accountType, flowChoice } = useAuth();
   const onboardingSeen = useOnboardingSeen();
 
@@ -16,12 +22,9 @@ export default function AppLayout() {
     );
   }
 
-  // Keep the admin shell reserved for STAFF and BOTH-users who picked admin.
-  // Pure CLIENT accounts bounce back to the root router so they land on the
-  // client experience — even if someone deep-links into the admin tabs.
-  if (accountType === 'CLIENT') return <Redirect href="/(client)/(tabs)/profile" />;
-  if (accountType === 'BOTH' && flowChoice === 'client') {
-    return <Redirect href="/(client)/(tabs)/profile" />;
+  if (accountType === 'STAFF') return <Redirect href="/(app)/(tabs)/in-transit" />;
+  if (accountType === 'BOTH' && flowChoice === 'admin') {
+    return <Redirect href="/(app)/(tabs)/in-transit" />;
   }
   if (accountType === 'BOTH' && flowChoice === null) {
     return <Redirect href="/flow-choice" />;

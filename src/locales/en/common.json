@@ -24,7 +24,10 @@
   "tabs": {
     "inTransit": "In Transit",
     "transfers": "Transfers",
-    "profile": "Profile"
+    "profile": "Profile",
+    "home": "Home",
+    "orders": "Orders",
+    "catalog": "Catalog"
   },
   "comingSoon": "Coming soon",
   "version": "Version"

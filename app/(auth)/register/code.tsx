@@ -60,7 +60,7 @@ export default function RegisterCodeScreen() {
           user: result.user as never,
           client: result.client,
         });
-        router.replace('/(app)/(tabs)/in-transit');
+        router.replace('/');
         return;
       }
 

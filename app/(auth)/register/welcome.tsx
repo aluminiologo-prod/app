@@ -77,8 +77,9 @@ export default function RegisterWelcomeScreen() {
 
   const handleExplore = () => {
     reset();
-    // TODO: once the public catalog is wired up, point this at the public home.
-    router.replace('/(app)/(tabs)/in-transit');
+    // Root router picks the right home based on account_type. New CLIENT
+    // accounts land on /(client)/(tabs)/profile automatically.
+    router.replace('/');
   };
 
   return (

@@ -64,7 +64,7 @@ export default function LoginOtpScreen() {
     try {
       setIsLoading(true);
       await loginWithOtp(phone, code);
-      router.replace('/(app)/(tabs)/in-transit');
+      router.replace('/');
     } catch (err) {
       setError(true);
       setCode('');
