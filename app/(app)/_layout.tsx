@@ -10,9 +10,7 @@ export default function AppLayout() {
   if (isLoading || onboardingSeen === null) return <LoadingScreen />;
   if (!isAuthenticated) {
     return (
-      <Redirect
-        href={onboardingSeen ? '/(auth)/register/phone' : '/onboarding'}
-      />
+      <Redirect href={onboardingSeen ? '/(auth)/login-otp' : '/onboarding'} />
     );
   }
 

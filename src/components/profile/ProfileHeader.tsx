@@ -1,5 +1,6 @@
 import { Pressable, Text, View, useColorScheme } from 'react-native';
 import { ChevronLeft, LogOut } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
 import { Colors } from '../../theme/colors';
 
 interface Props {
@@ -40,7 +41,10 @@ export function ProfileHeader({
     >
       {onBack ? (
         <Pressable
-          onPress={onBack}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onBack();
+          }}
           accessibilityRole="button"
           accessibilityLabel={backLabel}
           hitSlop={10}
@@ -71,7 +75,10 @@ export function ProfileHeader({
       </Text>
 
       <Pressable
-        onPress={onLogout}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          onLogout();
+        }}
         accessibilityRole="button"
         accessibilityLabel={logoutLabel}
         hitSlop={10}

@@ -35,8 +35,10 @@
     "fiscalDoc": "Fiscal document",
     "address": "Address",
     "empty": "Add",
-    "personType.INDIVIDUAL": "Individual",
-    "personType.BUSINESS": "Business"
+    "personType": {
+      "INDIVIDUAL": "Individual",
+      "BUSINESS": "Business"
+    }
   },
   "missingFieldName": {
     "name": "name",
@@ -72,10 +74,14 @@
       "titleItalic": "person",
       "titleTrailing": " or business",
       "subtitle": "Let us know whether you're buying for yourself or on behalf of a business.",
-      "INDIVIDUAL.title": "Individual",
-      "INDIVIDUAL.description": "A person buying for themselves.",
-      "BUSINESS.title": "Business",
-      "BUSINESS.description": "A company, workshop, or commercial client.",
+      "INDIVIDUAL": {
+        "title": "Individual",
+        "description": "A person buying for themselves."
+      },
+      "BUSINESS": {
+        "title": "Business",
+        "description": "A company, workshop, or commercial client."
+      },
       "successToast": "Person type updated"
     },
     "clientType": {
@@ -147,10 +153,14 @@
   "flowChoice": {
     "title": "Where would you like to go?",
     "subtitle": "Your account has access to both the customer experience and the admin tools.",
-    "client.title": "Continue as customer",
-    "client.subtitle": "Browse the catalog, manage orders and your profile.",
-    "admin.title": "Go to admin mode",
-    "admin.subtitle": "In-transit, transfers, and operations for staff.",
+    "client": {
+      "title": "Continue as customer",
+      "subtitle": "Browse the catalog, manage orders and your profile."
+    },
+    "admin": {
+      "title": "Go to admin mode",
+      "subtitle": "In-transit, transfers, and operations for staff."
+    },
     "remember": "You can switch anytime from your profile."
   },
   "logoutConfirm": {

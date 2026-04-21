@@ -48,6 +48,7 @@ export const LabeledInput = forwardRef<TextInput, Props>(function LabeledInput(
       <Input
         ref={ref as never}
         placeholderTextColor={isDark ? '#71717A' : '#A89F8E'}
+        accessibilityLabel={inputProps.accessibilityLabel ?? label}
         {...inputProps}
         style={{
           fontFamily: 'Inter_500Medium',

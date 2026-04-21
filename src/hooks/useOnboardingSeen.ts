@@ -11,9 +11,15 @@ export function useOnboardingSeen(): boolean | null {
 
   useEffect(() => {
     let cancelled = false;
-    hasSeenOnboarding().then((value) => {
-      if (!cancelled) setSeen(value);
-    });
+    hasSeenOnboarding()
+      .then((value) => {
+        if (!cancelled) setSeen(value);
+      })
+      .catch(() => {
+        // SecureStore read failed; treat as first-run so routing still progresses
+        // instead of getting stuck on the splash placeholder.
+        if (!cancelled) setSeen(false);
+      });
     return () => {
       cancelled = true;
     };

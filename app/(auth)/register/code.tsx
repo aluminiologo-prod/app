@@ -73,11 +73,15 @@ export default function RegisterCodeScreen() {
         },
       });
 
-      // Prime Supabase's local session so subsequent axios calls carry the Bearer.
-      await supabase.auth.setSession({
+      // Prime Supabase's local session so subsequent axios calls carry the
+      // Bearer. setSession returns { data, error } rather than throwing, so
+      // surface the error and abort navigation instead of proceeding with an
+      // unprimed session.
+      const { error: sessionError } = await supabase.auth.setSession({
         access_token: result.access_token,
         refresh_token: result.refresh_token,
       });
+      if (sessionError) throw sessionError;
 
       router.push('/(auth)/register/name');
     } catch (err) {
