@@ -892,6 +892,11 @@
     "@eslint/core" "^0.17.0"
     levn "^0.4.1"
 
+"@expo-google-fonts/fraunces@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.npmjs.org/@expo-google-fonts/fraunces/-/fraunces-0.4.1.tgz#1dd641c322436dccb7cc156e07e247d146cd000c"
+  integrity sha512-gYc9P92ObyWvz1rWPOeWSvVKyBFIuA8hgOdhvo4DSiPBaWLbFA6v8uLIEIBwW+0oWTlXbBzjeBReHQI2H7UNjQ==
+
 "@expo-google-fonts/inter@^0.4.2":
   version "0.4.2"
   resolved "https://registry.npmjs.org/@expo-google-fonts/inter/-/inter-0.4.2.tgz#2d37ffb1cb16600cff616b6c4c0efee9b6c47c28"

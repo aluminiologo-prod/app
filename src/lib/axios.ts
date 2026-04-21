@@ -33,6 +33,7 @@ api.interceptors.response.use(
       const isAuthEndpoint =
         requestUrl.includes('/auth/login') ||
         requestUrl.includes('/auth/otp') ||
+        requestUrl.includes('/auth/register') ||
         requestUrl.includes('/auth/forgot-password');
 
       if (!isAuthEndpoint) {

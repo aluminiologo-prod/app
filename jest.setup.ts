@@ -292,6 +292,11 @@ jest.mock('react-native-svg', () => {
     G: stub,
     Circle: stub,
     Rect: stub,
+    Defs: stub,
+    Pattern: stub,
+    LinearGradient: stub,
+    Stop: stub,
+    ClipPath: stub,
   };
 });
 

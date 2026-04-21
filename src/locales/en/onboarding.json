@@ -1,0 +1,48 @@
+{
+  "skip": "Skip",
+  "slide1": {
+    "eyebrow": "Welcome",
+    "titleLeading": "Hi,",
+    "titleItalic": "we're glad",
+    "titleTrailing": " to see you here.",
+    "body": "This is your new digital home as an AluminioLogo customer. Let us show you what's ahead."
+  },
+  "slide2": {
+    "eyebrow": "Access unlocked",
+    "titleLeading": "You just\nunlocked a",
+    "titleItalic": "new experience",
+    "titleTrailing": ".",
+    "body": "A faster, closer and more professional way to work with us."
+  },
+  "slide3": {
+    "badge": "Coming soon · 01",
+    "titleLeading": "Material",
+    "titleItalic": "calculator",
+    "titleTrailing": ".",
+    "body": "Enter the measurements of your window or system and instantly get the exact list of profiles, glass and accessories you need.",
+    "soon": "Coming soon"
+  },
+  "slide4": {
+    "badge": "Coming soon · 02",
+    "titleLeading": "Online",
+    "titleItalic": "store",
+    "titleTrailing": ", 24/7.",
+    "body": "Buy profiles, glass and accessories from your phone. Check real-time availability and arrange pickup or delivery.",
+    "soon": "Coming soon"
+  },
+  "slide5": {
+    "badge": "Coming soon · 03",
+    "titleLeading": "Club",
+    "titleItalic": "AluminioLogo",
+    "titleTrailing": ".",
+    "body": "Exclusive benefits, preferred pricing, early access to news, and a service designed for professionals like you.",
+    "soon": "Coming soon"
+  },
+  "slide6": {
+    "titleLeading": "This is",
+    "titleItalic": "just the beginning",
+    "titleTrailing": ".",
+    "body": "Your account is ready. Start exploring and join us on this journey.",
+    "cta": "Let's go"
+  }
+}

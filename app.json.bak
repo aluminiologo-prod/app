@@ -2,7 +2,7 @@
   "expo": {
     "name": "Aluminiologo",
     "slug": "aluminiologo-app",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -16,10 +16,10 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.aluminiologo.app",
       "icon": "./assets/icon.png",
-      "buildNumber": "1"
+      "buildNumber": "3"
     },
     "android": {
-      "versionCode": 1,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF",

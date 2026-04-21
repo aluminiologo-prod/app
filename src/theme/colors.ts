@@ -7,6 +7,23 @@ export const Colors = {
   warning: '#E5780B',
   danger: '#EC1F00',
 
+  // Registration / onboarding flow palette (serif headings, cream bg, navy ink)
+  brand: {
+    orange: '#E5780B',        // CTA, active icons, progress bar, italic serif accent
+    orangeDeep: '#C86306',    // pressed state
+    orangeSoft: '#FDEBD4',    // icon card background
+    orangeGlow: 'rgba(229,120,11,0.25)', // drop-shadow for active CTA
+    cream: '#FAF7F2',         // light-variant screen bg
+    creamSoft: '#F3EFE7',     // divider on cream
+    navy: '#1A2A4A',          // primary ink on cream
+    navyMuted: '#62728B',     // secondary copy on cream
+    navyDark: '#0C1B30',      // dark-variant screen bg (step 2)
+    navyDarker: '#0A1629',    // deeper shade for box-shadow layers
+    navySurface: '#223558',   // surfaces above navyDark (OTP boxes)
+    dotLight: '#E8E1D3',      // dotted pattern on cream
+    dotDark: '#1B2B48',       // dotted pattern on navyDark
+  },
+
   // Light mode surfaces
   light: {
     background: '#FFFFFF',
