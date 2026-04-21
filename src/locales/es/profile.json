@@ -28,7 +28,6 @@
   },
   "rows": {
     "name": "Nombre completo",
-    "personType": "Tipo de persona",
     "clientType": "Tipo de cliente",
     "phone": "Teléfono",
     "email": "Correo",
@@ -36,6 +35,7 @@
     "address": "Dirección",
     "empty": "Agregar",
     "personType": {
+      "label": "Tipo de persona",
       "INDIVIDUAL": "Persona natural",
       "BUSINESS": "Empresa"
     }

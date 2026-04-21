@@ -28,7 +28,6 @@
   },
   "rows": {
     "name": "Full name",
-    "personType": "Person type",
     "clientType": "Client type",
     "phone": "Phone",
     "email": "Email",
@@ -36,6 +35,7 @@
     "address": "Address",
     "empty": "Add",
     "personType": {
+      "label": "Person type",
       "INDIVIDUAL": "Individual",
       "BUSINESS": "Business"
     }
