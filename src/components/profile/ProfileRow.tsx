@@ -21,9 +21,10 @@ interface Props {
  *   [ soft-orange icon ]  [ LABEL ]    [ chevron ]
  *                         [ value ]
  *
- * Tappable — opens the matching edit sheet. When `value` is empty, renders
- * a muted "Add" affordance in the brand orange so the row always feels
- * actionable.
+ * The horizontal layout lives on an inner `<View>` — applying flex styles
+ * through Pressable's function-style callback is flaky on RN 0.81 + Reanimated 4
+ * (children sometimes fall back to column flex), so we keep the Pressable
+ * style minimal and use a plain row View underneath.
  */
 export function ProfileRow({
   icon: Icon,
@@ -49,97 +50,105 @@ export function ProfileRow({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${label}: ${hasValue ? value : emptyLabel}`}
-      style={({ pressed }) => ({
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        borderTopWidth: isFirst ? 0 : 1,
-        borderTopColor: borderColor,
-        opacity: pressed ? 0.6 : 1,
-      })}
+      android_ripple={{ color: 'rgba(0,0,0,0.05)' }}
+      style={({ pressed }) => [
+        {
+          borderTopWidth: isFirst ? 0 : 1,
+          borderTopColor: borderColor,
+        },
+        pressed ? { opacity: 0.6 } : null,
+      ]}
     >
       <View
         style={{
-          width: 40,
-          height: 40,
-          borderRadius: 12,
-          backgroundColor: iconBg,
+          flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'center',
-          marginRight: 14,
+          paddingHorizontal: 16,
+          paddingVertical: 14,
         }}
       >
-        <Icon size={18} color={Colors.brand.orange} strokeWidth={2} />
-      </View>
-      <View style={{ flex: 1, marginRight: 8 }}>
         <View
           style={{
-            flexDirection: 'row',
+            width: 40,
+            height: 40,
+            borderRadius: 12,
+            backgroundColor: iconBg,
             alignItems: 'center',
-            marginBottom: 2,
+            justifyContent: 'center',
+            marginRight: 14,
           }}
         >
-          <Text
+          <Icon size={18} color={Colors.brand.orange} strokeWidth={2} />
+        </View>
+        <View style={{ flex: 1, marginRight: 8, minWidth: 0 }}>
+          <View
             style={{
-              fontFamily: 'Inter_500Medium',
-              fontSize: 11,
-              letterSpacing: 1,
-              textTransform: 'uppercase',
-              color: labelColor,
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: 2,
             }}
-            numberOfLines={1}
           >
-            {label}
-          </Text>
-          {verified ? (
-            <View
+            <Text
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 3,
-                marginLeft: 8,
+                fontFamily: 'Inter_500Medium',
+                fontSize: 11,
+                letterSpacing: 1,
+                textTransform: 'uppercase',
+                color: labelColor,
               }}
+              numberOfLines={1}
             >
-              <Check size={11} color={Colors.success} strokeWidth={3} />
-              <Text
+              {label}
+            </Text>
+            {verified ? (
+              <View
                 style={{
-                  fontFamily: 'Inter_700Bold',
-                  fontSize: 9.5,
-                  letterSpacing: 0.6,
-                  textTransform: 'uppercase',
-                  color: Colors.success,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginLeft: 8,
                 }}
               >
-                {verifiedLabel}
-              </Text>
-            </View>
-          ) : null}
+                <Check size={11} color={Colors.success} strokeWidth={3} />
+                <Text
+                  style={{
+                    fontFamily: 'Inter_700Bold',
+                    fontSize: 9.5,
+                    letterSpacing: 0.6,
+                    textTransform: 'uppercase',
+                    color: Colors.success,
+                    marginLeft: 3,
+                  }}
+                >
+                  {verifiedLabel}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+          {hasValue ? (
+            <Text
+              style={{
+                fontFamily: 'Inter_700Bold',
+                fontSize: 15,
+                color: valueColor,
+              }}
+              numberOfLines={1}
+            >
+              {value}
+            </Text>
+          ) : (
+            <Text
+              style={{
+                fontFamily: 'Inter_600SemiBold',
+                fontSize: 13,
+                color: Colors.brand.orange,
+              }}
+            >
+              {emptyLabel}
+            </Text>
+          )}
         </View>
-        {hasValue ? (
-          <Text
-            style={{
-              fontFamily: 'Inter_700Bold',
-              fontSize: 15,
-              color: valueColor,
-            }}
-            numberOfLines={1}
-          >
-            {value}
-          </Text>
-        ) : (
-          <Text
-            style={{
-              fontFamily: 'Inter_600SemiBold',
-              fontSize: 13,
-              color: Colors.brand.orange,
-            }}
-          >
-            {emptyLabel}
-          </Text>
-        )}
+        <ChevronRight size={18} color={chevronColor} />
       </View>
-      <ChevronRight size={18} color={chevronColor} />
     </Pressable>
   );
 }
