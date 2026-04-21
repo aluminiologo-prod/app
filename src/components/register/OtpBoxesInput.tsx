@@ -49,8 +49,6 @@ export function OtpBoxesInput({
     }
   }, [autoFocus]);
 
-  const activeIndex = Math.min(value.length, length - 1);
-
   return (
     <Pressable onPress={() => inputRef.current?.focus()} accessibilityRole="none">
       <View
@@ -63,7 +61,6 @@ export function OtpBoxesInput({
         {Array.from({ length }).map((_, i) => (
           <OtpBox
             key={i}
-            index={i}
             digit={value[i] ?? ''}
             isActive={i === value.length && value.length < length}
             isFilled={i < value.length}
@@ -106,10 +103,6 @@ export function OtpBoxesInput({
       >
         {`${value.length} of ${length} digits entered`}
       </Text>
-      {/* Anchor active index so TS doesn't complain about unused var */}
-      <View style={{ height: 0, opacity: 0 }}>
-        <Text>{activeIndex}</Text>
-      </View>
     </Pressable>
   );
 }
@@ -121,7 +114,6 @@ function OtpBox({
   hasError,
   variant,
 }: {
-  index: number;
   digit: string;
   isActive: boolean;
   isFilled: boolean;

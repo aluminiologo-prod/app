@@ -107,10 +107,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user: AuthUser | null;
     client: unknown | null;
   }) => {
-    await supabase.auth.setSession({
+    const { error: sessionError } = await supabase.auth.setSession({
       access_token: data.access_token,
       refresh_token: data.refresh_token,
     });
+    if (sessionError) throw sessionError;
 
     // For CLIENT-only accounts the backend doesn't return a staff/user object
     // — fall back to the `client` payload so we still have something to render
@@ -203,6 +204,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const chooseFlow = useCallback(async (flow: FlowChoice) => {
+    // Reject choices incompatible with the current account type so a CLIENT
+    // account can't land in the admin shell (or vice-versa) via a deep link.
+    if (!accountType) return;
+    if (accountType === 'CLIENT' && flow !== 'client') return;
+    if (accountType === 'STAFF' && flow !== 'admin') return;
+
     await setFlowChoice(flow);
     setFlowChoiceState(flow);
     if (flow === 'client') {
@@ -210,7 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       router.replace('/(app)/(tabs)/in-transit');
     }
-  }, []);
+  }, [accountType]);
 
   return (
     <AuthContext.Provider

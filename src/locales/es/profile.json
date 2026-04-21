@@ -35,8 +35,10 @@
     "fiscalDoc": "Cédula / RIF",
     "address": "Dirección",
     "empty": "Agregar",
-    "personType.INDIVIDUAL": "Persona natural",
-    "personType.BUSINESS": "Empresa"
+    "personType": {
+      "INDIVIDUAL": "Persona natural",
+      "BUSINESS": "Empresa"
+    }
   },
   "missingFieldName": {
     "name": "nombre",
@@ -72,10 +74,14 @@
       "titleItalic": "persona",
       "titleTrailing": " o empresa",
       "subtitle": "Indícanos si compras para ti o en nombre de una empresa.",
-      "INDIVIDUAL.title": "Persona natural",
-      "INDIVIDUAL.description": "Una persona comprando para sí misma.",
-      "BUSINESS.title": "Empresa",
-      "BUSINESS.description": "Una compañía, taller o cliente comercial.",
+      "INDIVIDUAL": {
+        "title": "Persona natural",
+        "description": "Una persona comprando para sí misma."
+      },
+      "BUSINESS": {
+        "title": "Empresa",
+        "description": "Una compañía, taller o cliente comercial."
+      },
       "successToast": "Tipo de persona actualizado"
     },
     "clientType": {
@@ -147,10 +153,14 @@
   "flowChoice": {
     "title": "¿A dónde quieres ir?",
     "subtitle": "Tu cuenta tiene acceso a la experiencia del cliente y al panel administrativo.",
-    "client.title": "Continuar como cliente",
-    "client.subtitle": "Navega el catálogo, gestiona pedidos y tu perfil.",
-    "admin.title": "Ir al modo admin",
-    "admin.subtitle": "En tránsito, transferencias y operaciones del staff.",
+    "client": {
+      "title": "Continuar como cliente",
+      "subtitle": "Navega el catálogo, gestiona pedidos y tu perfil."
+    },
+    "admin": {
+      "title": "Ir al modo admin",
+      "subtitle": "En tránsito, transferencias y operaciones del staff."
+    },
     "remember": "Puedes cambiar en cualquier momento desde tu perfil."
   },
   "logoutConfirm": {

@@ -12,6 +12,7 @@ import { toastError, toastSuccess } from '../../../lib/toast';
 import { Colors } from '../../../theme/colors';
 
 const CODE_LENGTH = 6;
+const RESEND_COOLDOWN_SECONDS = 30;
 
 interface Props {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
   const [sendingCode, setSendingCode] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const { mutateAsync: syncPhone } = useSyncMyPhone();
 
   useEffect(() => {
@@ -38,8 +40,15 @@ export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
       setPhone(initialPhone ?? '');
       setCode('');
       setError(null);
+      setResendCooldown(0);
     }
   }, [isOpen, initialPhone]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   const canRequestCode =
     isValidPhone(phone) && phone !== (initialPhone ?? '') && !sendingCode;
@@ -52,6 +61,22 @@ export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
       const { error: err } = await supabase.auth.updateUser({ phone });
       if (err) throw err;
       setStep('code');
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    } catch {
+      setError(t('edit.phone.errors.sendFailed'));
+    } finally {
+      setSendingCode(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendCooldown > 0 || sendingCode) return;
+    setError(null);
+    setSendingCode(true);
+    try {
+      const { error: err } = await supabase.auth.updateUser({ phone });
+      if (err) throw err;
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
     } catch {
       setError(t('edit.phone.errors.sendFailed'));
     } finally {
@@ -202,10 +227,11 @@ export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
           </Text>
         </Pressable>
         <Pressable
-          onPress={handleRequestCode}
+          onPress={handleResend}
           accessibilityRole="button"
+          accessibilityState={{ disabled: resendCooldown > 0 || sendingCode }}
           hitSlop={10}
-          disabled={sendingCode}
+          disabled={resendCooldown > 0 || sendingCode}
         >
           <Text
             style={{
@@ -213,10 +239,15 @@ export function PhoneSheet({ isOpen, initialPhone, onClose }: Props) {
               fontSize: 12,
               letterSpacing: 0.6,
               textTransform: 'uppercase',
-              color: sendingCode ? Colors.brand.navyMuted : Colors.brand.orange,
+              color:
+                resendCooldown > 0 || sendingCode
+                  ? Colors.brand.navyMuted
+                  : Colors.brand.orange,
             }}
           >
-            {t('edit.phone.resend')}
+            {resendCooldown > 0
+              ? `${t('edit.phone.resend')} (${resendCooldown}s)`
+              : t('edit.phone.resend')}
           </Text>
         </Pressable>
       </View>
