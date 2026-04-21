@@ -193,93 +193,98 @@ export function EditSheetFrame({
           <View
             style={{
               flexDirection: 'row',
+              alignSelf: 'stretch',
               marginTop: 14,
               paddingBottom: Math.max(insets.bottom, 10),
             }}
           >
-            <Pressable
-              onPress={onClose}
-              accessibilityRole="button"
-              accessibilityLabel={cancelLabel ?? tCommon('cancel')}
-              style={({ pressed }) => [
-                { flex: 1, marginRight: 6 },
-                pressed ? { opacity: 0.7 } : null,
-              ]}
-            >
-              <View
-                style={{
-                  height: 52,
-                  borderRadius: 14,
-                  borderWidth: 1.5,
-                  borderColor: cancelBorder,
-                  backgroundColor: cancelBg,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+            {/* Each button lives inside a plain flex <View>: Pressable on
+                RN 0.81 + Reanimated 4 drops `flex: N` coming from its
+                style callback, so the children didn't stretch. Wrapping
+                with a regular View is the reliable way to split the row. */}
+            <View style={{ flex: 1, marginRight: 6 }}>
+              <Pressable
+                onPress={onClose}
+                accessibilityRole="button"
+                accessibilityLabel={cancelLabel ?? tCommon('cancel')}
+                style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
               >
-                <Text
+                <View
                   style={{
-                    fontFamily: 'Inter_700Bold',
-                    fontSize: 13,
-                    letterSpacing: 1,
-                    textTransform: 'uppercase',
-                    color: cancelText,
+                    height: 52,
+                    borderRadius: 14,
+                    borderWidth: 1.5,
+                    borderColor: cancelBorder,
+                    backgroundColor: cancelBg,
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  {cancelLabel ?? tCommon('cancel')}
-                </Text>
-              </View>
-            </Pressable>
-            <Pressable
-              onPress={primaryLoading ? undefined : onPrimary}
-              disabled={primaryDisabled || primaryLoading}
-              accessibilityRole="button"
-              accessibilityLabel={primaryLabel}
-              style={({ pressed }) => [
-                { flex: 1.4, marginLeft: 6 },
-                pressed && !primaryDisabled ? { opacity: 0.85 } : null,
-              ]}
-            >
-              <View
-                style={{
-                  height: 52,
-                  borderRadius: 14,
-                  backgroundColor: primaryDisabled
-                    ? isDark
-                      ? '#2C2D36'
-                      : '#F1E8D7'
-                    : Colors.brand.orange,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexDirection: 'row',
-                  shadowColor: Colors.brand.orange,
-                  shadowOpacity: primaryDisabled ? 0 : 0.25,
-                  shadowRadius: 12,
-                  shadowOffset: { width: 0, height: 6 },
-                  elevation: primaryDisabled ? 0 : 4,
-                }}
-              >
-                {primaryLoading ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
                   <Text
                     style={{
                       fontFamily: 'Inter_700Bold',
                       fontSize: 13,
                       letterSpacing: 1,
                       textTransform: 'uppercase',
-                      color: primaryDisabled
-                        ? isDark
-                          ? '#71717A'
-                          : '#C6B9A0'
-                        : '#FFFFFF',
+                      color: cancelText,
                     }}
                   >
-                    {primaryLabel}
+                    {cancelLabel ?? tCommon('cancel')}
                   </Text>
-                )}
-              </View>
-            </Pressable>
+                </View>
+              </Pressable>
+            </View>
+            <View style={{ flex: 1.4, marginLeft: 6 }}>
+              <Pressable
+                onPress={primaryLoading ? undefined : onPrimary}
+                disabled={primaryDisabled || primaryLoading}
+                accessibilityRole="button"
+                accessibilityLabel={primaryLabel}
+                style={({ pressed }) =>
+                  pressed && !primaryDisabled ? { opacity: 0.85 } : null
+                }
+              >
+                <View
+                  style={{
+                    height: 52,
+                    borderRadius: 14,
+                    backgroundColor: primaryDisabled
+                      ? isDark
+                        ? '#2C2D36'
+                        : '#F1E8D7'
+                      : Colors.brand.orange,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'row',
+                    shadowColor: Colors.brand.orange,
+                    shadowOpacity: primaryDisabled ? 0 : 0.25,
+                    shadowRadius: 12,
+                    shadowOffset: { width: 0, height: 6 },
+                    elevation: primaryDisabled ? 0 : 4,
+                  }}
+                >
+                  {primaryLoading ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text
+                      style={{
+                        fontFamily: 'Inter_700Bold',
+                        fontSize: 13,
+                        letterSpacing: 1,
+                        textTransform: 'uppercase',
+                        color: primaryDisabled
+                          ? isDark
+                            ? '#71717A'
+                            : '#C6B9A0'
+                          : '#FFFFFF',
+                      }}
+                    >
+                      {primaryLabel}
+                    </Text>
+                  )}
+                </View>
+              </Pressable>
+            </View>
           </View>
         ) : null}
       </Body>
