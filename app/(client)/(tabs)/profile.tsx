@@ -282,7 +282,7 @@ export default function ClientProfileScreen() {
           />
           <ProfileRow
             icon={UserCircle2}
-            label={t('rows.personType')}
+            label={t('rows.personType.label')}
             value={
               client.person_type ? t(`rows.personType.${client.person_type}`) : null
             }
