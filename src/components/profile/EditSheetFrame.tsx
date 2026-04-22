@@ -183,7 +183,11 @@ export function EditSheetFrame({
           <View style={{ height: 22 }} />
         )}
 
-        {children}
+        {/* Only mount the sheet's form/body when open — otherwise TextInputs
+            inside it (especially any with autoFocus) pull focus even while
+            the sheet is collapsed, which causes Android to pop the keyboard
+            on profile mount. */}
+        {isOpen ? children : null}
 
         {/* Footer (inline — auto-sizes with the sheet).
             The button visuals live on inner <View>s: Pressable's
