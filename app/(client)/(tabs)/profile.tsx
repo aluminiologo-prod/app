@@ -359,49 +359,57 @@ export default function ClientProfileScreen() {
           />
         </ProfileSection>
 
-        {/* Switch to admin (only for BOTH) */}
+        {/* Switch to admin (only for BOTH) — layout lives on a child <View>
+           because Pressable's function-style callback drops complex style
+           objects (flexDirection, gap, etc.) on RN 0.81, same bug worked
+           around in EditSheetFrame. */}
         {accountType === 'BOTH' ? (
-          <Pressable
-            onPress={handleSwitchFlow}
-            style={({ pressed }) => ({
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 12,
-              marginHorizontal: 16,
-              marginTop: 22,
-              padding: 14,
-              borderRadius: 14,
-              borderWidth: 1,
-              borderColor: isDark ? '#272831' : Colors.brand.creamSoft,
-              backgroundColor: isDark ? '#18191F' : '#FFFFFF',
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <View
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                backgroundColor: Colors.primaryLight,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+          <View style={{ marginHorizontal: 16, marginTop: 22 }}>
+            <Pressable
+              onPress={handleSwitchFlow}
+              accessibilityRole="button"
+              accessibilityLabel={t('header.switchFlow')}
+              style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
             >
-              <Building2 size={18} color={Colors.primary} strokeWidth={2} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text
+              <View
                 style={{
-                  fontFamily: 'Inter_600SemiBold',
-                  fontSize: 14,
-                  color: titleColor,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: 14,
+                  borderRadius: 14,
+                  borderWidth: 1,
+                  borderColor: isDark ? '#272831' : Colors.brand.creamSoft,
+                  backgroundColor: isDark ? '#18191F' : '#FFFFFF',
                 }}
               >
-                {t('header.switchFlow')}
-              </Text>
-            </View>
-            <Repeat size={16} color={subtleText} />
-          </Pressable>
+                <View
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    backgroundColor: Colors.primaryLight,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Building2 size={18} color={Colors.primary} strokeWidth={2} />
+                </View>
+                <Text
+                  style={{
+                    flex: 1,
+                    fontFamily: 'Inter_600SemiBold',
+                    fontSize: 14,
+                    color: titleColor,
+                  }}
+                  numberOfLines={1}
+                >
+                  {t('header.switchFlow')}
+                </Text>
+                <Repeat size={16} color={subtleText} />
+              </View>
+            </Pressable>
+          </View>
         ) : null}
 
         <Text
