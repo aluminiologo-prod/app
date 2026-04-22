@@ -28,7 +28,9 @@ import { SoonBadge } from '../../src/components/onboarding/SoonBadge';
 import { FeatureIconCard } from '../../src/components/onboarding/FeatureIconCard';
 import { PulseRings } from '../../src/components/onboarding/PulseRings';
 import { PrimaryCta } from '../../src/components/register/PrimaryCta';
-import { markOnboardingSeen } from '../../src/lib/onboarding';
+import { useAuth } from '../../src/contexts/AuthContext';
+import { useMarkMyOnboardingComplete } from '../../src/hooks/queries';
+import { toastApiError } from '../../src/lib/toast';
 
 type Variant = 'light' | 'dark';
 
@@ -40,6 +42,9 @@ const SLIDE_VARIANTS: Variant[] = ['light', 'dark', 'light', 'dark', 'light', 'l
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation('onboarding');
+  const { logout } = useAuth();
+  const { mutateAsync: markOnboardingComplete, isPending: isFinishing } =
+    useMarkMyOnboardingComplete();
 
   const [index, setIndex] = useState(0);
   const progress = useSharedValue(0);
@@ -56,11 +61,27 @@ export default function OnboardingScreen() {
     }
   }, []);
 
-  const finish = useCallback(async () => {
+  /** LET'S GO on the final slide — flip the backend flag, then enter the app. */
+  const handleComplete = useCallback(async () => {
     clearTimer();
-    await markOnboardingSeen();
-    router.replace('/(auth)/register/phone');
-  }, [clearTimer]);
+    try {
+      await markOnboardingComplete();
+      router.replace('/(client)/(tabs)/home');
+    } catch (err) {
+      toastApiError(err);
+    }
+  }, [clearTimer, markOnboardingComplete]);
+
+  /**
+   * X button / "Skip" — close without flipping the flag. We log the user out
+   * so they land back on the login screen; the next successful login will
+   * re-enter the client shell and the guard will send them through the deck
+   * again since `client.onboarding` is still false.
+   */
+  const handleSkip = useCallback(async () => {
+    clearTimer();
+    await logout();
+  }, [clearTimer, logout]);
 
   const advance = useCallback(() => {
     setIndex((current) => {
@@ -129,7 +150,7 @@ export default function OnboardingScreen() {
           activeIndex={index}
           totalSlides={TOTAL_SLIDES}
           progress={progress}
-          onClose={finish}
+          onClose={handleSkip}
         />
 
         {/* Body — tap anywhere (outside the footer) to advance */}
@@ -157,7 +178,7 @@ export default function OnboardingScreen() {
               entering={FadeIn.duration(320).delay(260)}
             >
               <Pressable
-                onPress={finish}
+                onPress={handleSkip}
                 accessibilityRole="button"
                 accessibilityLabel={t('skip')}
                 hitSlop={16}
@@ -186,7 +207,11 @@ export default function OnboardingScreen() {
               entering={FadeInDown.duration(420).delay(260).springify().damping(18)}
               style={{ alignSelf: 'stretch' }}
             >
-              <PrimaryCta label={t('slide6.cta')} onPress={finish} />
+              <PrimaryCta
+                label={t('slide6.cta')}
+                onPress={handleComplete}
+                loading={isFinishing}
+              />
             </Animated.View>
           )}
         </View>
