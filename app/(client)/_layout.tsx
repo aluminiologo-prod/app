@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { Slot, Redirect } from 'expo-router';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useMyClient } from '../../src/hooks/queries';
 import { LoadingScreen } from '../../src/components/ui/LoadingScreen';
+import { toastApiError } from '../../src/lib/toast';
 
 /**
  * Mirror of `app/(app)/_layout.tsx` — this is the shell for CLIENT users.
@@ -15,10 +17,36 @@ import { LoadingScreen } from '../../src/components/ui/LoadingScreen';
  * the myClient cache and lets this guard fall through to <Slot /> on re-render.
  */
 export default function ClientLayout() {
-  const { isAuthenticated, isLoading, accountType, flowChoice } = useAuth();
-  const { data: client, isLoading: clientLoading } = useMyClient({
-    enabled: isAuthenticated,
-  });
+  const { isAuthenticated, isLoading, accountType, flowChoice, logout } =
+    useAuth();
+  const {
+    data: client,
+    isLoading: clientLoading,
+    isError: clientError,
+    error,
+  } = useMyClient({ enabled: isAuthenticated });
+
+  // TEMP DEBUG — remove once the spinner loop is diagnosed
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('[(client)/_layout] useMyClient state', {
+        clientLoading,
+        hasClient: !!client,
+        isError: clientError,
+        errorMessage: error instanceof Error ? error.message : String(error),
+        client_onboarding: client?.onboarding,
+      });
+    }
+  }, [isAuthenticated, clientLoading, client, clientError, error]);
+
+  // Fetch failed — log the user out so they can retry a clean session instead
+  // of staring at an infinite spinner.
+  useEffect(() => {
+    if (clientError) {
+      toastApiError(error);
+      logout();
+    }
+  }, [clientError, error, logout]);
 
   if (isLoading) return <LoadingScreen />;
   if (!isAuthenticated) return <Redirect href="/(auth)/login-otp" />;
