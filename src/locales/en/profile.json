@@ -154,12 +154,18 @@
     "title": "Where would you like to go?",
     "subtitle": "Your account has access to both the customer experience and the admin tools.",
     "client": {
-      "title": "Continue as customer",
-      "subtitle": "Browse the catalog, manage orders and your profile."
+      "title": "Customer mode",
+      "subtitle": "Shop the AluminioLogo catalog, track orders, and manage your profile.",
+      "feature1": "Browse the full catalog and compare variants",
+      "feature2": "Place orders and follow delivery status",
+      "feature3": "Keep your addresses and fiscal info up to date"
     },
     "admin": {
-      "title": "Go to admin mode",
-      "subtitle": "In-transit, transfers, and operations for staff."
+      "title": "Admin mode",
+      "subtitle": "Staff tools for operations, inventory, and fulfillment.",
+      "feature1": "Monitor in-transit shipments between stores",
+      "feature2": "Receive transfers and log incidents",
+      "feature3": "Access advanced reports and workflows"
     },
     "remember": "You can switch anytime from your profile."
   },

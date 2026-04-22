@@ -10,6 +10,7 @@ import { listCountries } from '../services/countries.service';
 import { getPublicClientTypes } from '../services/client-types.service';
 import {
   getMyClient,
+  markMyOnboardingComplete,
   syncMyPhone,
   updateMyAddress,
   updateMyClientType,
@@ -126,6 +127,21 @@ export function useSyncMyPhone() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: syncMyPhone,
+    onSuccess: (client: Client) => {
+      qc.setQueryData<Client>(queryKeys.myClient(), client);
+    },
+  });
+}
+
+/**
+ * Flips `client.onboarding` to true on the backend. Called when the user taps
+ * "LET'S GO" on the final onboarding slide. The `(client)/_layout.tsx` guard
+ * reads the updated cache to stop redirecting to `/onboarding`.
+ */
+export function useMarkMyOnboardingComplete() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: markMyOnboardingComplete,
     onSuccess: (client: Client) => {
       qc.setQueryData<Client>(queryKeys.myClient(), client);
     },

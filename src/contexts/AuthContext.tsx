@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 import api from '../lib/axios';
 import type { AuthUser, AccountType } from '../types/auth';
@@ -18,6 +19,19 @@ import {
   setFlowChoice,
   type FlowChoice,
 } from '../lib/flowChoice';
+
+/**
+ * iOS keeps the keychain (and therefore Supabase's persisted session) alive
+ * across app uninstalls — it only clears on device reset. That means a user
+ * who deletes and reinstalls the app gets silently re-logged in on the next
+ * launch, which isn't the experience we want for a "fresh install".
+ *
+ * AsyncStorage, on the other hand, lives in the app sandbox and IS wiped on
+ * uninstall. We use a sentinel key there to detect the first-ever launch of
+ * this install and, if we find a stale Supabase session, tear it down so the
+ * user lands on the registration/login flow as expected.
+ */
+const FRESH_INSTALL_SENTINEL_KEY = 'aluminiologo.install_v1';
 
 export interface LoginResponsePayload {
   access_token: string;
@@ -57,6 +71,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function restoreSession() {
       try {
+        // Detect a fresh install. If the AsyncStorage sentinel is missing, this
+        // is either the first launch ever or the first launch after an uninstall
+        // — either way, any Supabase session we find would be a stale keychain
+        // leftover from a previous install, so scrub it before anyone asks.
+        const installSentinel = await AsyncStorage.getItem(
+          FRESH_INSTALL_SENTINEL_KEY,
+        );
+        if (!installSentinel) {
+          await supabase.auth.signOut();
+          await SecureStore.deleteItemAsync(USER_STORAGE_KEY);
+          await SecureStore.deleteItemAsync(`${USER_STORAGE_KEY}_type`);
+          await clearFlowChoice();
+          await AsyncStorage.setItem(FRESH_INSTALL_SENTINEL_KEY, '1');
+          setUser(null);
+          setAccountType(null);
+          setFlowChoiceState(null);
+          return;
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           const storedUser = await SecureStore.getItemAsync(USER_STORAGE_KEY);
@@ -213,7 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await setFlowChoice(flow);
     setFlowChoiceState(flow);
     if (flow === 'client') {
-      router.replace('/(client)/(tabs)/profile');
+      router.replace('/(client)/(tabs)/home');
     } else {
       router.replace('/(app)/(tabs)/in-transit');
     }

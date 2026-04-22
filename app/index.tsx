@@ -1,29 +1,25 @@
 import { Redirect } from 'expo-router';
 import { useAuth } from '../src/contexts/AuthContext';
-import { useOnboardingSeen } from '../src/hooks/useOnboardingSeen';
 import { getPostAuthRoute } from '../src/lib/postAuthRoute';
 import { LoadingScreen } from '../src/components/ui/LoadingScreen';
 
 /**
- * Root router. Branches by auth state, onboarding state, and account type:
+ * Root router. Branches by auth state and account type:
  *
- *   - Onboarding never seen → /onboarding
- *   - Not authenticated      → /(auth)/register/phone
- *   - STAFF  account         → /(app)/(tabs)/in-transit
- *   - CLIENT account         → /(client)/(tabs)/profile
- *   - BOTH   account         → /flow-choice (once) → then persisted choice
+ *   - Not authenticated → /(auth)/login-otp
+ *   - STAFF  account    → /(app)/(tabs)/in-transit
+ *   - CLIENT account    → /(client)/(tabs)/home (client layout re-gates onboarding)
+ *   - BOTH   account    → /flow-choice (once) → then persisted choice
  *
- * Keeping the branching here (instead of inside each auth screen) means every
- * post-login redirect can simply land on `/` and the correct destination is
- * picked from the latest AuthContext state.
+ * The 6-slide onboarding deck is no longer gated here — it's owned by the
+ * `(client)/_layout.tsx` guard, which reads `client.onboarding` and shows the
+ * deck on the first client-shell entry.
  */
 export default function Index() {
   const { isAuthenticated, isLoading, accountType, flowChoice } = useAuth();
-  const onboardingSeen = useOnboardingSeen();
 
-  if (isLoading || onboardingSeen === null) return <LoadingScreen />;
-  if (!onboardingSeen) return <Redirect href="/onboarding" />;
-  if (!isAuthenticated) return <Redirect href="/(auth)/register/phone" />;
+  if (isLoading) return <LoadingScreen />;
+  if (!isAuthenticated) return <Redirect href="/(auth)/login-otp" />;
 
   return <Redirect href={getPostAuthRoute(accountType, flowChoice)} />;
 }

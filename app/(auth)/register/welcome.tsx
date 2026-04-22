@@ -78,7 +78,8 @@ export default function RegisterWelcomeScreen() {
   const handleExplore = () => {
     reset();
     // Root router picks the right home based on account_type. New CLIENT
-    // accounts land on /(client)/(tabs)/profile automatically.
+    // accounts land on /(client)/(tabs)/home, and the client layout then
+    // sends them through /onboarding before the tabs render.
     router.replace('/');
   };
 

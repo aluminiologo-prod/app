@@ -154,12 +154,18 @@
     "title": "¿A dónde quieres ir?",
     "subtitle": "Tu cuenta tiene acceso a la experiencia del cliente y al panel administrativo.",
     "client": {
-      "title": "Continuar como cliente",
-      "subtitle": "Navega el catálogo, gestiona pedidos y tu perfil."
+      "title": "Modo cliente",
+      "subtitle": "Compra en el catálogo, sigue tus pedidos y gestiona tu perfil.",
+      "feature1": "Explora el catálogo completo y compara variantes",
+      "feature2": "Haz pedidos y sigue el estado del envío",
+      "feature3": "Mantén tus direcciones y datos fiscales al día"
     },
     "admin": {
-      "title": "Ir al modo admin",
-      "subtitle": "En tránsito, transferencias y operaciones del staff."
+      "title": "Modo administrador",
+      "subtitle": "Herramientas del staff para operaciones, inventario y despacho.",
+      "feature1": "Monitorea envíos en tránsito entre tiendas",
+      "feature2": "Recibe transferencias y registra incidencias",
+      "feature3": "Accede a reportes y flujos avanzados"
     },
     "remember": "Puedes cambiar en cualquier momento desde tu perfil."
   },

@@ -61,3 +61,12 @@ export async function syncMyPhone(): Promise<Client> {
   const { data } = await api.patch('/clients/me/phone/sync');
   return data;
 }
+
+/**
+ * One-way flag flip: marks the onboarding slide deck as complete. Called when
+ * the user taps "LET'S GO" on the final onboarding slide.
+ */
+export async function markMyOnboardingComplete(): Promise<Client> {
+  const { data } = await api.patch('/clients/me/onboarding');
+  return data;
+}
