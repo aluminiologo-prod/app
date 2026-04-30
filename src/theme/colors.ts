@@ -53,17 +53,17 @@ export const Colors = {
 
 // Status chip colors
 export const STATUS_COLORS = {
+  TO_BE_APPROVED: { bg: '#EBF1FF', text: '#3874FF', border: '#ADC8FF' },
   DRAFT:      { bg: '#F4F4F5', text: '#31374A', border: '#E4E4E7' },
   IN_TRANSIT: { bg: '#FEF3E2', text: '#E5780B', border: '#FDDCB5' },
   RECEIVED:   { bg: '#E8F8E3', text: '#25B003', border: '#C3EEB8' },
-  DISPATCHED: { bg: '#EBF1FF', text: '#3874FF', border: '#ADC8FF' },
   CANCELLED:  { bg: '#FEEBE7', text: '#EC1F00', border: '#F9C0B5' },
 } as const;
 
 export const STATUS_COLORS_DARK = {
+  TO_BE_APPROVED: { bg: '#0B1833', text: '#5B91FF', border: '#172F66' },
   DRAFT:      { bg: '#1F2028', text: '#9BA1B0', border: '#272831' },
   IN_TRANSIT: { bg: '#2A1F0A', text: '#E5780B', border: '#4A3210' },
   RECEIVED:   { bg: '#0D2007', text: '#25B003', border: '#1A3D0F' },
-  DISPATCHED: { bg: '#0B1833', text: '#5B91FF', border: '#172F66' },
   CANCELLED:  { bg: '#2A0803', text: '#EC1F00', border: '#4A1208' },
 } as const;

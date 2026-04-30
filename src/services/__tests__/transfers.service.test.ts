@@ -140,11 +140,10 @@ describe('transfers.service', () => {
       expect(result.items[0].code).toBe('TR-001');
     });
 
-    it('passes dispatched_today and received_today when provided', async () => {
+    it('passes received_today when provided', async () => {
       mockGet.mockResolvedValue({ data: mockPaginatedResponse });
       const query: TransferQuery = {
-        statuses: 'DISPATCHED,RECEIVED',
-        dispatched_today: '2024-05-01',
+        statuses: 'IN_TRANSIT,RECEIVED',
         received_today: '2024-05-01',
       };
 

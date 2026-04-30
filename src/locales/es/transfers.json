@@ -87,7 +87,17 @@
       "updatedAt": "Actualizado",
       "dispatchedAt": "Despachado",
       "receivedAt": "Recibido",
-      "noData": "—"
+      "noData": "—",
+      "destinationStockConfig": "Stock en {{store}}",
+      "stockQuantity": "Actual",
+      "stockReserved": "Reservado",
+      "stockMin": "Pto. pedido",
+      "stockSafety": "Seguridad",
+      "stockMax": "Máximo",
+      "stockReorder": "Reposición",
+      "shortfallAlert": "Solo se pudieron transferir {{sent}} de {{reorder}} unidades configuradas como reposición. Faltaron {{missing}} unidades por falta de stock en el almacén origen.",
+      "fullReplenishment": "Se cubrió la cantidad de reposición completa ({{qty}} unidades).",
+      "noDestinationStockConfig": "No hay configuración de stock para esta variante en la tienda destino."
     }
   }
 }

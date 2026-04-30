@@ -1,7 +1,26 @@
 import type { Store } from './store';
 import type { PaginatedResponse } from './common';
 
-export type TransferStatus = 'DRAFT' | 'DISPATCHED' | 'IN_TRANSIT' | 'RECEIVED' | 'CANCELLED';
+export type TransferStatus = 'TO_BE_APPROVED' | 'DRAFT' | 'IN_TRANSIT' | 'RECEIVED' | 'CANCELLED';
+
+export interface VariantStockRecord {
+  id: string;
+  article_variant_id: string;
+  store_id: string;
+  quantity: number;
+  reserved_quantity: number;
+  incoming_quantity: number;
+  min_stock: number;
+  safety_stock: number;
+  max_stock: number;
+  reorder_quantity: number;
+}
+
+export interface VariantPhoto {
+  id: string;
+  url: string;
+  is_primary?: boolean;
+}
 
 export interface ArticleVariantMinimal {
   id: string;
@@ -14,7 +33,10 @@ export interface ArticleVariantMinimal {
     id: string;
     name: string;
     hex: string;
+    hex_code?: string;
   } | null;
+  photos?: VariantPhoto[];
+  stock?: VariantStockRecord[];
 }
 
 export interface TransferLine {
@@ -81,7 +103,6 @@ export interface TransferQuery {
   orderBy?: string;
   page?: number;
   limit?: number;
-  dispatched_today?: string;
   received_today?: string;
 }
 

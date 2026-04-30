@@ -22,7 +22,7 @@ import { Colors } from '../../../src/theme/colors';
 import { ModuleCode } from '../../../src/config/module-codes';
 import type { Transfer, ReceiveTransferPayload } from '../../../src/types/transfer';
 
-const ALL_STATUSES = 'DRAFT,IN_TRANSIT,RECEIVED,DISPATCHED';
+const ALL_STATUSES = 'TO_BE_APPROVED,DRAFT,IN_TRANSIT,RECEIVED';
 
 interface InTransitFilters extends Record<string, unknown> {
   search: string;
@@ -57,7 +57,6 @@ export default function InTransitScreen() {
       return getTransfers({
         ...clean,
         statuses: ALL_STATUSES,
-        dispatched_today: today,
         received_today: today,
       });
     },

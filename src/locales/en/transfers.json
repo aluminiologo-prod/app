@@ -87,7 +87,17 @@
       "updatedAt": "Updated",
       "dispatchedAt": "Dispatched",
       "receivedAt": "Received",
-      "noData": "—"
+      "noData": "—",
+      "destinationStockConfig": "Stock config at {{store}}",
+      "stockQuantity": "Current",
+      "stockReserved": "Reserved",
+      "stockMin": "Reorder pt.",
+      "stockSafety": "Safety",
+      "stockMax": "Max",
+      "stockReorder": "Reorder qty",
+      "shortfallAlert": "Only {{sent}} of {{reorder}} configured units could be transferred. {{missing}} units short due to insufficient stock at the origin warehouse.",
+      "fullReplenishment": "Full reorder quantity covered ({{qty}} units).",
+      "noDestinationStockConfig": "No stock configuration for this variant at the destination store."
     }
   }
 }
