@@ -41,6 +41,7 @@ interface TransferCardGridProps {
   onViewDetails: (transfer: Transfer) => void;
   onDispatch: (transfer: Transfer) => void;
   onReceive: (transfer: Transfer) => void;
+  onReview?: (transfer: Transfer) => void;
   onRefresh: () => void;
 }
 
@@ -57,6 +58,7 @@ export function TransferCardGrid({
   onViewDetails,
   onDispatch,
   onReceive,
+  onReview,
   onRefresh,
 }: TransferCardGridProps) {
   const { t } = useTranslation('transfers');
@@ -84,9 +86,10 @@ export function TransferCardGrid({
         onViewDetails={onViewDetails}
         onDispatch={onDispatch}
         onReceive={onReceive}
+        onReview={onReview}
       />
     ),
-    [canUpdate, pendingIds, onViewDetails, onDispatch, onReceive],
+    [canUpdate, pendingIds, onViewDetails, onDispatch, onReceive, onReview],
   );
 
   // Stable renderSectionHeader.
