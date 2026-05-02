@@ -11,18 +11,25 @@ import * as Haptics from 'expo-haptics';
 import { useCrudList } from '../../../src/hooks/useCrudList';
 import { usePermissions } from '../../../src/hooks/usePermissions';
 import { useStoresList } from '../../../src/hooks/queries';
-import { getTransfers, dispatchTransfer, receiveTransfer } from '../../../src/services/transfers.service';
+import {
+  getTransfers,
+  dispatchTransfer,
+  receiveTransfer,
+  approveAutomaticTransfer,
+  rejectAutomaticTransfer,
+} from '../../../src/services/transfers.service';
 import { toastSuccess, toastApiError } from '../../../src/lib/toast';
 import { TransferCardGrid } from '../../../src/components/transfers/TransferCardGrid';
 import { TransferDetailSheet } from '../../../src/components/transfers/TransferDetailSheet';
 import { TransferReceiveSheet } from '../../../src/components/transfers/TransferReceiveSheet';
+import { TransferAutoApproveSheet } from '../../../src/components/transfers/TransferAutoApproveSheet';
 import { FilterSheet } from '../../../src/components/ui/FilterSheet';
 import { ConfirmModal } from '../../../src/components/ui/ConfirmModal';
 import { Colors } from '../../../src/theme/colors';
 import { ModuleCode } from '../../../src/config/module-codes';
 import type { Transfer, ReceiveTransferPayload } from '../../../src/types/transfer';
 
-const ALL_STATUSES = 'DRAFT,IN_TRANSIT,RECEIVED,DISPATCHED';
+const ALL_STATUSES = 'TO_BE_APPROVED,DRAFT,IN_TRANSIT,RECEIVED';
 
 interface InTransitFilters extends Record<string, unknown> {
   search: string;
@@ -57,7 +64,6 @@ export default function InTransitScreen() {
       return getTransfers({
         ...clean,
         statuses: ALL_STATUSES,
-        dispatched_today: today,
         received_today: today,
       });
     },
@@ -113,6 +119,12 @@ export default function InTransitScreen() {
   const [receiveOpen, setReceiveOpen] = useState(false);
   const [receiveLoading, setReceiveLoading] = useState(false);
 
+  // Review (auto-approve / reject) sheet
+  const [reviewTarget, setReviewTarget] = useState<Transfer | null>(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
+
   // Filter sheet
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -134,6 +146,16 @@ export default function InTransitScreen() {
   const handleCloseReceive = useCallback(() => {
     setReceiveOpen(false);
     setReceiveTarget(null);
+  }, []);
+
+  const handleOpenReview = useCallback((tr: Transfer) => {
+    setReviewTarget(tr);
+    setReviewOpen(true);
+  }, []);
+
+  const handleCloseReview = useCallback(() => {
+    setReviewOpen(false);
+    setReviewTarget(null);
   }, []);
 
   const handleOpenFilter = useCallback(() => setFilterOpen(true), []);
@@ -203,6 +225,76 @@ export default function InTransitScreen() {
       toastApiError(err);
     } finally {
       setDispatchLoading(false);
+      removePending(id);
+    }
+  }
+
+  async function handleApproveAuto(id: string) {
+    setIsApproving(true);
+    addPending(id);
+
+    const listQueryKey = ['in-transit', 'list'];
+    const previousData = queryClient.getQueriesData({ queryKey: listQueryKey });
+
+    queryClient.setQueriesData<{ items: Transfer[]; pagination: unknown }>(
+      { queryKey: listQueryKey },
+      (old) => {
+        if (!old) return old;
+        return { ...old, items: old.items.map((item) =>
+          item.id === id ? { ...item, status: 'IN_TRANSIT' as const } : item
+        )};
+      },
+    );
+    setReviewOpen(false);
+
+    try {
+      await approveAutomaticTransfer(id);
+      toastSuccess(t('inTransit.autoApproveSheet.approveSuccess'));
+      crud.refresh();
+    } catch (err) {
+      for (const [key, data] of previousData) {
+        queryClient.setQueryData(key, data);
+      }
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      toastApiError(err);
+    } finally {
+      setIsApproving(false);
+      setReviewTarget(null);
+      removePending(id);
+    }
+  }
+
+  async function handleRejectAuto(id: string) {
+    setIsRejecting(true);
+    addPending(id);
+
+    const listQueryKey = ['in-transit', 'list'];
+    const previousData = queryClient.getQueriesData({ queryKey: listQueryKey });
+
+    queryClient.setQueriesData<{ items: Transfer[]; pagination: unknown }>(
+      { queryKey: listQueryKey },
+      (old) => {
+        if (!old) return old;
+        return { ...old, items: old.items.map((item) =>
+          item.id === id ? { ...item, status: 'CANCELLED' as const } : item
+        )};
+      },
+    );
+    setReviewOpen(false);
+
+    try {
+      await rejectAutomaticTransfer(id);
+      toastSuccess(t('inTransit.autoApproveSheet.rejectSuccess'));
+      crud.refresh();
+    } catch (err) {
+      for (const [key, data] of previousData) {
+        queryClient.setQueryData(key, data);
+      }
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      toastApiError(err);
+    } finally {
+      setIsRejecting(false);
+      setReviewTarget(null);
       removePending(id);
     }
   }
@@ -348,6 +440,7 @@ export default function InTransitScreen() {
         onViewDetails={handleOpenDetail}
         onDispatch={openDispatchConfirm}
         onReceive={handleOpenReceive}
+        onReview={handleOpenReview}
         onRefresh={crud.refresh}
       />
       </View>
@@ -364,6 +457,15 @@ export default function InTransitScreen() {
         isLoading={receiveLoading}
         onClose={handleCloseReceive}
         onConfirm={handleReceive}
+      />
+      <TransferAutoApproveSheet
+        transferId={reviewTarget?.id ?? null}
+        isOpen={reviewOpen}
+        isApproving={isApproving}
+        isRejecting={isRejecting}
+        onClose={handleCloseReview}
+        onApprove={handleApproveAuto}
+        onReject={handleRejectAuto}
       />
       <FilterSheet
         isOpen={filterOpen}

@@ -30,3 +30,13 @@ export async function completeTransfer(id: string): Promise<Transfer> {
   const { data } = await api.patch(`/transferences/${id}/complete`);
   return data;
 }
+
+export async function approveAutomaticTransfer(id: string): Promise<Transfer> {
+  const { data } = await api.patch(`/transferences/${id}/approve-auto`);
+  return data;
+}
+
+export async function rejectAutomaticTransfer(id: string): Promise<Transfer> {
+  const { data } = await api.patch(`/transferences/${id}/reject-auto`);
+  return data;
+}

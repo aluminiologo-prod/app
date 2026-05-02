@@ -1,13 +1,14 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, Pressable } from 'react-native';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react-native';
+import { X, ChevronDown } from 'lucide-react-native';
 import { StatusChip } from '../ui/StatusChip';
+import { SignedImage } from '../ui/SignedImage';
 import { Colors } from '../../theme/colors';
 import { useTransfer } from '../../hooks/queries';
-import type { Transfer } from '../../types/transfer';
+import type { Transfer, TransferLine } from '../../types/transfer';
 
 // Stable style objects — defined once at module scope.
 const SHEET_BG_STYLE = { backgroundColor: '#FFFFFF' };
@@ -118,24 +119,17 @@ function TransferDetailContent({ transfer, t }: { transfer: Transfer; t: ReturnT
       {transfer.lines && transfer.lines.length > 0 && (
         <>
           <SectionTitle label={t('inTransit.detail.productList')} />
-          {transfer.lines.map((line) => (
-            <View key={line.id} className="flex-row items-center py-2.5 border-b border-[#E4E4E7] gap-3">
-              {/* Color dot */}
-              <View
-                className="w-3 h-3 rounded-full flex-shrink-0"
-                style={{ backgroundColor: line.article_variant?.color?.hex ?? '#D4D4D8' }}
+          <View className="gap-2 mt-1">
+            {transfer.lines.map((line) => (
+              <ProductLineItem
+                key={line.id}
+                line={line}
+                toStoreId={transfer.to_store_id}
+                toStoreName={transfer.to_store?.name ?? ''}
+                t={t}
               />
-              <View className="flex-1">
-                <Text className="text-sm font-medium text-[#11181C]" numberOfLines={1}>
-                  {line.article_variant?.article?.name}
-                </Text>
-                <Text className="text-xs text-[#71717A]">{line.article_variant?.sku}</Text>
-              </View>
-              <Text className="text-sm font-semibold text-[#11181C]">
-                {line.quantity_sent}
-              </Text>
-            </View>
-          ))}
+            ))}
+          </View>
         </>
       )}
 
@@ -158,5 +152,135 @@ function SectionTitle({ label }: { label: string }) {
     <Text className="text-xs font-semibold uppercase tracking-widest text-[#71717A] mt-5 mb-1">
       {label}
     </Text>
+  );
+}
+
+interface ProductLineItemProps {
+  line: TransferLine;
+  toStoreId: string;
+  toStoreName: string;
+  t: ReturnType<typeof useTranslation<'transfers'>>['t'];
+}
+
+function ProductLineItem({ line, toStoreId, toStoreName, t }: ProductLineItemProps) {
+  const [expanded, setExpanded] = useState(false);
+  const variant = line.article_variant;
+  const primaryPhoto =
+    variant?.photos?.find((p) => p.is_primary) ?? variant?.photos?.[0];
+  const destinationStock = variant?.stock?.find((s) => s.store_id === toStoreId);
+  const qtySent = Number(line.quantity_sent);
+  const reorderQty = destinationStock ? Number(destinationStock.reorder_quantity) : 0;
+  const shortfall =
+    reorderQty > 0 && qtySent < reorderQty ? reorderQty - qtySent : 0;
+  const colorHex =
+    variant?.color?.hex_code ?? variant?.color?.hex ?? null;
+
+  return (
+    <View className="rounded-xl bg-[#F4F4F5] overflow-hidden">
+      <Pressable
+        onPress={() => setExpanded((v) => !v)}
+        className="flex-row items-center gap-3 p-3 active:opacity-70"
+      >
+        <View className="w-12 h-12 rounded-md bg-white border border-[#E4E4E7] overflow-hidden">
+          <SignedImage
+            path={primaryPhoto?.url}
+            className="w-full h-full"
+            fallbackIconSize={20}
+          />
+        </View>
+        <View className="flex-1 min-w-0">
+          <Text className="text-sm font-medium text-[#11181C]" numberOfLines={1}>
+            {variant?.article?.name ?? ''}
+          </Text>
+          <Text className="text-xs font-mono text-[#71717A]" numberOfLines={1}>
+            {variant?.sku ?? ''}
+          </Text>
+          {variant?.color && (
+            <View className="flex-row items-center gap-1.5 mt-0.5">
+              {colorHex && (
+                <View
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: colorHex }}
+                />
+              )}
+              <Text className="text-xs text-[#71717A]">{variant.color.name}</Text>
+            </View>
+          )}
+        </View>
+        <Text className="text-sm font-semibold text-[#11181C]">{qtySent}</Text>
+        <View
+          style={{ transform: [{ rotate: expanded ? '180deg' : '0deg' }] }}
+        >
+          <ChevronDown size={16} color="#71717A" />
+        </View>
+      </Pressable>
+      {expanded && (
+        <View className="border-t border-[#E4E4E7] bg-white px-3 py-3 gap-2">
+          {destinationStock ? (
+            <>
+              <Text className="text-[10px] uppercase tracking-widest font-semibold text-[#71717A]">
+                {t('inTransit.detail.destinationStockConfig', { store: toStoreName })}
+              </Text>
+              <View className="flex-row flex-wrap">
+                <StockField
+                  label={t('inTransit.detail.stockQuantity')}
+                  value={Number(destinationStock.quantity)}
+                />
+                <StockField
+                  label={t('inTransit.detail.stockReserved')}
+                  value={Number(destinationStock.reserved_quantity)}
+                />
+                <StockField
+                  label={t('inTransit.detail.stockMin')}
+                  value={Number(destinationStock.min_stock)}
+                />
+                <StockField
+                  label={t('inTransit.detail.stockSafety')}
+                  value={Number(destinationStock.safety_stock)}
+                />
+                <StockField
+                  label={t('inTransit.detail.stockMax')}
+                  value={Number(destinationStock.max_stock)}
+                />
+                <StockField
+                  label={t('inTransit.detail.stockReorder')}
+                  value={reorderQty}
+                />
+              </View>
+              {shortfall > 0 ? (
+                <View className="rounded-md bg-[#FFF4E5] border border-[#FBD7A6] px-3 py-2">
+                  <Text className="text-xs text-[#9A4D00]">
+                    {t('inTransit.detail.shortfallAlert', {
+                      sent: qtySent,
+                      reorder: reorderQty,
+                      missing: shortfall,
+                    })}
+                  </Text>
+                </View>
+              ) : reorderQty > 0 ? (
+                <View className="rounded-md bg-[#E5F8E0] border border-[#A8E29B] px-3 py-2">
+                  <Text className="text-xs text-[#1F6D14]">
+                    {t('inTransit.detail.fullReplenishment', { qty: qtySent })}
+                  </Text>
+                </View>
+              ) : null}
+            </>
+          ) : (
+            <Text className="text-xs italic text-[#71717A]">
+              {t('inTransit.detail.noDestinationStockConfig')}
+            </Text>
+          )}
+        </View>
+      )}
+    </View>
+  );
+}
+
+function StockField({ label, value }: { label: string; value: number }) {
+  return (
+    <View className="w-1/3 mb-2">
+      <Text className="text-[10px] text-[#71717A]">{label}</Text>
+      <Text className="text-sm font-semibold text-[#11181C]">{value}</Text>
+    </View>
   );
 }

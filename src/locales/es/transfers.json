@@ -1,7 +1,7 @@
 {
   "status": {
+    "TO_BE_APPROVED": "Por Aprobar",
     "DRAFT": "Borrador",
-    "DISPATCHED": "Despachado",
     "IN_TRANSIT": "En Tránsito",
     "RECEIVED": "Recibido",
     "CANCELLED": "Cancelado"
@@ -30,6 +30,7 @@
     "units_one": "{{count}} unidad",
     "units_other": "{{count}} unidades",
     "viewDetails": "Detalles",
+    "review": "Revisar",
     "dispatch": "Poner en Tránsito",
     "receive": "Recibir",
     "complete": "Completar",
@@ -41,10 +42,10 @@
     "errorTitle": "Error de conexión",
     "errorMessage": "No se pudieron cargar las transferencias. Verifica tu conexión e intenta de nuevo.",
     "retry": "Reintentar",
+    "sectionToBeApproved": "Por Aprobar",
     "sectionDraft": "Borrador",
     "sectionInTransit": "En Tránsito",
     "sectionReceived": "Recibido",
-    "sectionDispatched": "Despachado",
     "receiveModal": {
       "title": "Recibir Transferencia",
       "subtitle": "Verifica las cantidades recibidas",
@@ -69,6 +70,31 @@
       "confirmReceiveWithIncident": "Confirmar con Incidencia",
       "quantityExceedsSent": "No puede exceder {{max}}"
     },
+    "autoApproveSheet": {
+      "title": "Revisar Transferencia Automática",
+      "subtitle": "Aprueba para despachar, o rechaza para liberar el stock reservado.",
+      "fromStore": "Origen",
+      "toStore": "Destino",
+      "transitStore": "Almacén de Tránsito",
+      "estimatedArrival": "Llegada Estimada",
+      "notes": "Notas",
+      "productList": "Productos",
+      "units": "Unidades",
+      "summary": "Resumen",
+      "totalProducts_one": "{{count}} producto",
+      "totalProducts_other": "{{count}} productos",
+      "totalUnits_one": "{{count}} unidad",
+      "totalUnits_other": "{{count}} unidades",
+      "whatHappens": "¿Qué sucederá?",
+      "approveTitle": "Si apruebas",
+      "approveDescription": "El stock se descontará del almacén de origen y se moverá al almacén de tránsito. La transferencia pasará a En Tránsito y quedará lista para recibir en el destino.",
+      "rejectTitle": "Si rechazas",
+      "rejectDescription": "La transferencia se cancelará y las {{units}} unidades reservadas en el origen quedarán nuevamente disponibles.",
+      "approveButton": "Aprobar y despachar",
+      "rejectButton": "Rechazar",
+      "approveSuccess": "Transferencia aprobada y puesta en tránsito",
+      "rejectSuccess": "Transferencia rechazada. Stock reservado liberado."
+    },
     "detail": {
       "title": "Detalles de Transferencia",
       "generalInfo": "Información General",
@@ -87,7 +113,17 @@
       "updatedAt": "Actualizado",
       "dispatchedAt": "Despachado",
       "receivedAt": "Recibido",
-      "noData": "—"
+      "noData": "—",
+      "destinationStockConfig": "Stock en {{store}}",
+      "stockQuantity": "Actual",
+      "stockReserved": "Reservado",
+      "stockMin": "Pto. pedido",
+      "stockSafety": "Seguridad",
+      "stockMax": "Máximo",
+      "stockReorder": "Reposición",
+      "shortfallAlert": "Solo se pudieron transferir {{sent}} de {{reorder}} unidades configuradas como reposición. Faltaron {{missing}} unidades por falta de stock en el almacén origen.",
+      "fullReplenishment": "Se cubrió la cantidad de reposición completa ({{qty}} unidades).",
+      "noDestinationStockConfig": "No hay configuración de stock para esta variante en la tienda destino."
     }
   }
 }

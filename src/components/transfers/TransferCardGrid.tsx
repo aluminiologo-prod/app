@@ -7,13 +7,13 @@ import { StatusChip } from '../ui/StatusChip';
 import { Colors } from '../../theme/colors';
 import type { Transfer, TransferStatus } from '../../types/transfer';
 
-const STATUS_ORDER: TransferStatus[] = ['DRAFT', 'IN_TRANSIT', 'RECEIVED', 'DISPATCHED'];
+const STATUS_ORDER: TransferStatus[] = ['TO_BE_APPROVED', 'DRAFT', 'IN_TRANSIT', 'RECEIVED'];
 
 const SECTION_KEY_MAP: Record<TransferStatus, string> = {
+  TO_BE_APPROVED: 'inTransit.sectionToBeApproved',
   DRAFT:      'inTransit.sectionDraft',
   IN_TRANSIT: 'inTransit.sectionInTransit',
   RECEIVED:   'inTransit.sectionReceived',
-  DISPATCHED: 'inTransit.sectionDispatched',
   CANCELLED:  'inTransit.sectionDraft',
 };
 
@@ -41,6 +41,7 @@ interface TransferCardGridProps {
   onViewDetails: (transfer: Transfer) => void;
   onDispatch: (transfer: Transfer) => void;
   onReceive: (transfer: Transfer) => void;
+  onReview?: (transfer: Transfer) => void;
   onRefresh: () => void;
 }
 
@@ -57,6 +58,7 @@ export function TransferCardGrid({
   onViewDetails,
   onDispatch,
   onReceive,
+  onReview,
   onRefresh,
 }: TransferCardGridProps) {
   const { t } = useTranslation('transfers');
@@ -84,9 +86,10 @@ export function TransferCardGrid({
         onViewDetails={onViewDetails}
         onDispatch={onDispatch}
         onReceive={onReceive}
+        onReview={onReview}
       />
     ),
-    [canUpdate, pendingIds, onViewDetails, onDispatch, onReceive],
+    [canUpdate, pendingIds, onViewDetails, onDispatch, onReceive, onReview],
   );
 
   // Stable renderSectionHeader.

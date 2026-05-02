@@ -154,7 +154,7 @@ describe('TransferCard', () => {
   });
 
   describe('action buttons — terminal statuses', () => {
-    it.each<TransferStatus>(['RECEIVED', 'DISPATCHED', 'CANCELLED'])(
+    it.each<TransferStatus>(['RECEIVED', 'CANCELLED'])(
       'does NOT show dispatch or receive button for %s status',
       (status) => {
         render(

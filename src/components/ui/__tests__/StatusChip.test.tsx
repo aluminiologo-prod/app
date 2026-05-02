@@ -27,10 +27,10 @@ import type { TransferStatus } from '../../../types/transfer';
 // ---------------------------------------------------------------------------
 
 const ALL_STATUSES: TransferStatus[] = [
+  'TO_BE_APPROVED',
   'DRAFT',
   'IN_TRANSIT',
   'RECEIVED',
-  'DISPATCHED',
   'CANCELLED',
 ];
 

@@ -14,6 +14,7 @@ interface TransferCardProps {
   onViewDetails: (transfer: Transfer) => void;
   onDispatch: (transfer: Transfer) => void;
   onReceive: (transfer: Transfer) => void;
+  onReview?: (transfer: Transfer) => void;
 }
 
 export const TransferCard = React.memo(function TransferCard({
@@ -23,6 +24,7 @@ export const TransferCard = React.memo(function TransferCard({
   onViewDetails,
   onDispatch,
   onReceive,
+  onReview,
 }: TransferCardProps) {
   const { t } = useTranslation('transfers');
 
@@ -50,6 +52,12 @@ export const TransferCard = React.memo(function TransferCard({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onReceive(transfer);
   }, [onReceive, transfer]);
+
+  const handleReview = useCallback(() => {
+    if (!onReview) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onReview(transfer);
+  }, [onReview, transfer]);
 
   return (
     <Pressable
@@ -98,6 +106,18 @@ export const TransferCard = React.memo(function TransferCard({
                 {t('inTransit.viewDetails')}
               </Text>
             </Pressable>
+
+            {canUpdate && transfer.status === 'TO_BE_APPROVED' && onReview && (
+              <Pressable
+                onPress={handleReview}
+                className="px-3 py-1.5 rounded-xl active:opacity-70"
+                style={{ backgroundColor: Colors.primary }}
+              >
+                <Text className="text-xs font-semibold text-white">
+                  {t('inTransit.review')}
+                </Text>
+              </Pressable>
+            )}
 
             {canUpdate && transfer.status === 'DRAFT' && (
               <Pressable
